@@ -1,412 +1,1064 @@
-# 📚 Dia 1 - SQL & Analytics | Jornada de Dados
+# 📚 Dia 1: SQL & Analytics | Jornada de Dados
 
-## 🎯 Bem-vindo ao Primeiro Dia da Imersão!
-
-Este é o **primeiro dia da sua Jornada de Dados**. Aqui você vai aprender a usar **SQL** para responder perguntas reais de negócio, analisando dados de um e-commerce.
-
-**Não é uma aula teórica de SQL. É uma imersão prática em como dados resolvem problemas reais.**
+Bem-vindo ao **primeiro dia da imersão Jornada de Dados**! Hoje você vai aprender SQL do zero, pensando como um analista de dados que precisa responder perguntas de negócio.
 
 ---
 
-## 🎯 Objetivo do Dia 1
+## 📖 O que é SQL?
 
-Ao final deste dia, você será capaz de:
+**SQL** (Structured Query Language) é a linguagem padrão para trabalhar com bancos de dados relacionais. É a ferramenta que permite:
 
-- ✅ **Escrever queries SQL** para responder perguntas de negócio
-- ✅ **Entender relacionamentos** entre tabelas (JOINs)
-- ✅ **Calcular KPIs** básicos (receita, top produtos, ticket médio)
-- ✅ **Comparar preços** com concorrentes
-- ✅ **Criar segmentações** de clientes usando lógica condicional
-- ✅ **Pensar como um analista de dados**
+- ✅ **Consultar dados** - Extrair informações de tabelas
+- ✅ **Analisar dados** - Calcular métricas, agregações e estatísticas
+- ✅ **Manipular dados** - Inserir, atualizar e deletar registros
+- ✅ **Estruturar dados** - Criar tabelas, relacionamentos e índices
 
----
+**SQL não é uma linguagem de programação tradicional.** É uma linguagem declarativa: você descreve **o que quer**, não **como fazer**. O banco de dados decide a melhor forma de executar.
 
-## 📊 O Cenário do Projeto
+**Exemplo:**
+```sql
+-- Você diz: "Quero os produtos mais caros"
+SELECT nome_produto, preco_atual 
+FROM produtos 
+ORDER BY preco_atual DESC 
+LIMIT 10;
 
-Você está trabalhando com uma **empresa de e-commerce** que precisa usar dados para tomar decisões melhores. A empresa tem:
-
-- **200 produtos** no catálogo
-- **50 clientes** cadastrados
-- **~3.000 vendas** nos últimos 30 dias
-- **Preços de concorrentes** coletados para comparação
-
-**Sua missão:** Usar SQL para descobrir insights que ajudem a empresa a vender mais e melhor.
-
----
-
-## 📦 Os 4 Datasets que Vamos Usar
-
-### 1. `produtos.csv` - Catálogo de Produtos
-Informações sobre todos os produtos da empresa.
-
-**Colunas:**
-- `id_produto` - ID único do produto
-- `nome_produto` - Nome do produto (ex: "Smartphone Galaxy A54", "Panela de Pressão")
-- `categoria` - Categoria (Eletrônicos, Casa, Cozinha, Moda, Esporte, etc.)
-- `marca` - Marca (Samsung, Apple, Nike, Adidas, etc.)
-- `preco_atual` - Preço atual do produto (R$)
-- `data_criacao` - Data de criação do produto
-
-**Total:** 200 produtos (30 são "top sellers")
-
----
-
-### 2. `clientes.csv` - Base de Clientes
-Informações sobre os clientes da empresa.
-
-**Colunas:**
-- `id_cliente` - ID único do cliente
-- `nome_cliente` - Nome completo do cliente
-- `estado` - Estado (UF) onde o cliente está localizado
-- `pais` - País (sempre "Brasil")
-- `data_cadastro` - Data de cadastro do cliente
-
-**Total:** 50 clientes
-
-**💡 Importante:** A segmentação de clientes (VIP, TOP_TIER, REGULAR) **não vem pronta**. Você vai criar usando **CASE WHEN** baseado no comportamento de compra (receita total). Isso é parte do aprendizado!
-
----
-
-### 3. `vendas.csv` - Histórico de Vendas
-Registro de todas as vendas realizadas.
-
-**Colunas:**
-- `id_venda` - ID único da venda
-- `data_venda` - Data e hora da venda (timestamp)
-- `id_cliente` - ID do cliente que fez a compra
-- `id_produto` - ID do produto vendido
-- `canal_venda` - Canal de venda (`ecommerce` ou `loja_fisica`)
-- `quantidade` - Quantidade vendida
-- `preco_unitario` - Preço unitário da venda (pode ter desconto/promoção)
-
-**Total:** ~3.000 vendas (últimos 30 dias, ~100 vendas/dia)
-
-**Cálculo importante:**
-- **Receita da venda** = `quantidade × preco_unitario`
-- `preco_unitario` pode ser diferente de `preco_atual` (produtos podem ter promoção)
-
----
-
-### 4. `preco_competidores.csv` - Preços dos Concorrentes
-Preços coletados dos principais concorrentes para comparação.
-
-**Colunas:**
-- `id_produto` - ID do produto
-- `nome_concorrente` - Nome do concorrente (Mercado Livre, Amazon, Magalu, Shopee)
-- `preco_concorrente` - Preço do concorrente (R$)
-- `data_coleta` - Data e hora da coleta do preço
-
-**Total:** ~680 registros (não todos os produtos têm preço de todos os concorrentes)
-
-**Concorrentes monitorados:**
-- Mercado Livre
-- Amazon
-- Magalu
-- Shopee
-
----
-
-## 🔗 Como as Tabelas se Relacionam
-
-```
-┌─────────────┐
-│  clientes   │
-│             │
-│ id_cliente  │◄─────┐
-│    ...      │      │
-└─────────────┘      │
-                     │
-┌─────────────┐      │      ┌─────────────┐
-│  produtos   │      │      │   vendas    │
-│             │      │      │             │
-│ id_produto  │◄─────┼──────┤ id_cliente  │
-│    ...      │      │      │ id_produto  │
-└─────────────┘      │      │    ...      │
-      │              │      └─────────────┘
-      │              │
-      │              │
-      ▼              │
-┌─────────────────┐  │
-│preco_competidores│ │
-│                 │  │
-│   id_produto    │──┘
-│ nome_concorrente│
-│    ...          │
-└─────────────────┘
+-- O banco decide como buscar isso de forma eficiente
 ```
 
-**Relacionamentos:**
-- 1 cliente → N vendas (um cliente pode fazer várias compras)
-- 1 produto → N vendas (um produto pode ser vendido várias vezes)
-- 1 produto → N preços de concorrentes (um produto pode ter preços de vários concorrentes)
+---
+
+## 💼 Mercado de SQL
+
+SQL é uma das habilidades mais demandadas no mercado de dados e tecnologia:
+
+### 📊 Por que SQL é importante?
+
+1. **Universalidade**: Quase todos os bancos de dados relacionais usam SQL
+2. **Demanda de mercado**: Uma das habilidades mais procuradas em vagas de dados
+3. **Base para outras ferramentas**: BI tools (Power BI, Tableau), Python (pandas), R, etc.
+4. **Carreira**: Analista de Dados, Cientista de Dados, Engenheiro de Dados, todos precisam de SQL
+
+### 🎯 Onde SQL é usado?
+
+- **Análise de Negócio**: Responder perguntas estratégicas
+- **Business Intelligence**: Criar dashboards e relatórios
+- **Data Science**: Preparar e explorar dados
+- **Desenvolvimento**: Backend de aplicações
+- **Data Engineering**: Transformar e mover dados
+
+### 💰 Salários no Brasil (2024)
+
+- **Analista de Dados Júnior**: R$ 3.000 - R$ 6.000
+- **Analista de Dados Pleno**: R$ 6.000 - R$ 10.000
+- **Analista de Dados Sênior**: R$ 10.000 - R$ 18.000
+- **Cientista de Dados**: R$ 8.000 - R$ 20.000+
+- **Engenheiro de Dados**: R$ 10.000 - R$ 25.000+
+
+**SQL é a base de todas essas carreiras.**
 
 ---
 
-## 🛠️ Comandos SQL que Você Vai Aprender Hoje
+## 🛠️ Plataforma para Aprender SQL
 
-### 📊 Nível 1: Fundamentos (Exemplos 1-4)
-- **`SELECT`** - Selecionar colunas de uma tabela
-- **`FROM`** - Especificar a tabela de origem
-- **`WHERE`** - Filtrar registros com condições
-- **`ORDER BY`** - Ordenar resultados (crescente/decrescente)
-- **`LIMIT`** - Limitar quantidade de resultados
+Existem várias plataformas e bancos de dados para aprender SQL:
+
+### Opções Disponíveis:
+
+- **PostgreSQL** - Banco open-source robusto e completo
+- **MySQL** - Um dos mais populares
+- **SQLite** - Banco leve, perfeito para começar
+- **Microsoft SQL Server** - Solução enterprise da Microsoft
+- **Oracle** - Banco enterprise robusto
+- **AWS RDS** - PostgreSQL/MySQL na nuvem AWS
+- **Azure SQL** - Solução cloud da Microsoft
+- **Supabase** - Plataforma moderna com PostgreSQL + ferramentas extras
+
+### 🚀 Por que vamos usar Supabase?
+
+Neste curso, vamos usar **[Supabase](https://supabase.com/)** porque:
+
+✅ **PostgreSQL completo** - Banco de dados profissional e robusto  
+✅ **Interface web** - Editor SQL integrado, fácil de usar  
+✅ **Gratuito** - Plano free generoso para aprender  
+✅ **Moderno** - Ferramentas extras (Auth, Storage, Realtime)  
+✅ **Fácil setup** - Criação de projeto em minutos  
+✅ **Documentação excelente** - Recursos e tutoriais completos  
+
+**Supabase é essencialmente PostgreSQL com uma interface moderna e ferramentas extras.** Tudo que você aprender aqui funciona em qualquer PostgreSQL.
+
+---
+
+## 🎓 Introdução ao SQL
+
+### O que é um Banco de Dados?
+
+Um **banco de dados** é uma coleção organizada de dados estruturados, armazenados eletronicamente. É como uma biblioteca digital onde:
+
+- **Tabelas** = Prateleiras organizadas
+- **Linhas (registros)** = Livros individuais
+- **Colunas (campos)** = Informações sobre cada livro (título, autor, ano)
 
 **Exemplo prático:**
-```sql
-SELECT nome_produto, preco_atual
-FROM produtos
-WHERE preco_atual > 500
-ORDER BY preco_atual DESC
-LIMIT 10;
 ```
+Banco de Dados: E-commerce
+├── Tabela: produtos (200 produtos)
+├── Tabela: clientes (50 clientes)
+├── Tabela: vendas (3.000 vendas)
+└── Tabela: preco_competidores (680 preços)
+```
+
+### O que é uma Tabela?
+
+Uma **tabela** é uma estrutura bidimensional que organiza dados em:
+
+- **Linhas (Rows)**: Cada linha representa um registro único
+- **Colunas (Columns)**: Cada coluna representa um atributo/campo
+
+**Exemplo de tabela `produtos`:**
+
+| id_produto | nome_produto | categoria | marca | preco_atual |
+|------------|--------------|-----------|-------|-------------|
+| prd_001 | Smartphone Galaxy A54 | Eletrônicos | Samsung | 1299.90 |
+| prd_002 | Panela de Pressão | Cozinha | Tramontina | 89.90 |
+| prd_003 | Tênis Nike Air Max | Tênis | Nike | 599.90 |
+
+**Características:**
+- Cada linha é única (identificada por `id_produto`)
+- Cada coluna tem um tipo de dado (texto, número, data)
+- Tabelas podem se relacionar entre si (relacionamentos)
+
+### 🔄 Fluxo de Trabalho com SQL
+
+O fluxo de trabalho com SQL segue este caminho:
+
+```mermaid
+graph LR
+    A[Desenvolvedor/<br/>Analista] --> B[IDE/<br/>Editor SQL]
+    B --> C[SGBD<br/>Sistema Gerenciador<br/>de Banco de Dados]
+    C --> D[Banco de Dados]
+    D --> E[Tabelas]
+    E --> F[Dados]
+    
+    style A fill:#4A90E2,color:#fff
+    style B fill:#50C878,color:#fff
+    style C fill:#FF6B6B,color:#fff
+    style D fill:#FFD93D,color:#000
+    style E fill:#9B59B6,color:#fff
+    style F fill:#1ABC9C,color:#fff
+```
+
+**Explicação do fluxo:**
+
+1. **Desenvolvedor/Analista**: Você escreve a query SQL
+2. **IDE/Editor SQL**: Ferramenta onde você escreve (Supabase SQL Editor, DBeaver, pgAdmin, etc.)
+3. **SGBD (Sistema Gerenciador de Banco de Dados)**: Software que gerencia o banco (PostgreSQL, MySQL, etc.)
+4. **Banco de Dados**: O banco específico (ex: `ecommerce_db`)
+5. **Tabelas**: Estruturas dentro do banco (ex: `produtos`, `vendas`)
+6. **Dados**: Os registros reais armazenados
+
+**No nosso caso:**
+- **Você** → **Supabase SQL Editor** → **PostgreSQL** → **Banco ecommerce** → **Tabelas** → **Dados**
+
+---
+
+## 📝 Comandos SQL - Categorias
+
+SQL é dividido em categorias de comandos baseados em sua função:
+
+### 1. **DDL - Data Definition Language** (Linguagem de Definição de Dados)
+
+Comandos para **criar, modificar e excluir estruturas** de banco de dados:
+
+```sql
+-- Criar estruturas
+CREATE TABLE produtos (...);
+CREATE DATABASE ecommerce;
+CREATE VIEW produtos_vendidos AS (...);
+CREATE INDEX idx_categoria ON produtos(categoria);
+
+-- Modificar estruturas
+ALTER TABLE produtos ADD COLUMN descricao TEXT;
+ALTER TABLE produtos MODIFY COLUMN preco_atual DECIMAL(10,2);
+
+-- Excluir estruturas
+DROP TABLE produtos;
+DROP DATABASE ecommerce;
+DROP VIEW produtos_vendidos;
+```
+
+**Comandos DDL:**
+- `CREATE` - Criar tabelas, bancos, views, índices
+- `ALTER` - Modificar estruturas existentes
+- `DROP` - Excluir estruturas
+- `TRUNCATE` - Limpar dados de uma tabela (mantém estrutura)
+
+---
+
+### 2. **DML - Data Manipulation Language** (Linguagem de Manipulação de Dados)
+
+Comandos para **inserir, atualizar e deletar dados**:
+
+```sql
+-- Inserir dados
+INSERT INTO produtos (nome_produto, categoria, preco_atual)
+VALUES ('Smartphone Galaxy A54', 'Eletrônicos', 1299.90);
+
+-- Atualizar dados
+UPDATE produtos 
+SET preco_atual = 1199.90 
+WHERE id_produto = 'prd_001';
+
+-- Deletar dados
+DELETE FROM produtos 
+WHERE categoria = 'Tênis';
+```
+
+**Comandos DML:**
+- `INSERT` - Inserir novos registros
+- `UPDATE` - Atualizar registros existentes
+- `DELETE` - Deletar registros
+- `MERGE` - Inserir ou atualizar (upsert)
+
+---
+
+### 3. **DQL - Data Query Language** (Linguagem de Consulta de Dados)
+
+Comandos para **consultar e recuperar dados**:
+
+```sql
+-- Consultar dados
+SELECT nome_produto, preco_atual 
+FROM produtos 
+WHERE categoria = 'Eletrônicos'
+ORDER BY preco_atual DESC;
+
+-- Agregações
+SELECT categoria, COUNT(*) as total
+FROM produtos
+GROUP BY categoria;
+
+-- JOINs
+SELECT p.nome_produto, v.quantidade
+FROM produtos p
+INNER JOIN vendas v ON p.id_produto = v.id_produto;
+```
+
+**Comando DQL:**
+- `SELECT` - Consultar e recuperar dados (o mais usado!)
+
+**Neste curso, focamos principalmente em DQL (SELECT)** porque é o que analistas de dados mais usam.
+
+---
+
+### 4. **DCL - Data Control Language** (Linguagem de Controle de Dados)
+
+Comandos para **controlar acesso e permissões**:
+
+```sql
+-- Conceder permissões
+GRANT SELECT ON produtos TO analista;
+GRANT INSERT, UPDATE ON vendas TO vendedor;
+
+-- Revogar permissões
+REVOKE DELETE ON produtos FROM usuario;
+```
+
+**Comandos DCL:**
+- `GRANT` - Conceder permissões
+- `REVOKE` - Revogar permissões
+
+**Nota:** Em ambientes de aprendizado (como Supabase), você geralmente tem todas as permissões. Em produção, DCL é crucial para segurança.
+
+---
+
+### 5. **TCL - Transaction Control Language** (Linguagem de Controle de Transações)
+
+Comandos para **controlar transações** (agrupar operações):
+
+```sql
+-- Iniciar transação
+BEGIN;
+
+-- Operações
+INSERT INTO produtos (...) VALUES (...);
+UPDATE produtos SET preco_atual = 100 WHERE id = 1;
+
+-- Confirmar (salvar)
+COMMIT;
+
+-- Ou cancelar (desfazer)
+ROLLBACK;
+```
+
+**Comandos TCL:**
+- `BEGIN` - Iniciar transação
+- `COMMIT` - Confirmar e salvar mudanças
+- `ROLLBACK` - Cancelar e desfazer mudanças
+- `SAVEPOINT` - Ponto de salvamento dentro da transação
+
+**Nota:** Transações garantem que operações múltiplas sejam executadas juntas ou nenhuma seja executada (atomicidade).
+
+---
+
+## 🎯 Foco do Curso
+
+Neste **Dia 1**, vamos focar em:
+
+✅ **DQL (SELECT)** - 90% do tempo  
+✅ **DDL básico** - CREATE VIEW, CREATE TABLE (exemplos finais)  
+✅ **Conceitos fundamentais** - JOINs, agregações, filtros  
+
+**Por quê?** Analistas de dados passam 90% do tempo consultando dados, não criando estruturas. Você vai aprender a **pensar com dados** e **responder perguntas de negócio**.
+
+---
+
+## 🎯 Progressão de Aprendizado
+
+### 📊 Nível 1: Fundamentos (Exemplos 1-4)
+
+#### `exemplo-01-select-basico.sql`
+**Conceito:** SELECT básico  
+**Pergunta de Negócio:** Quais produtos temos no catálogo?  
+**O que você aprende:**
+- Como selecionar colunas específicas de uma tabela
+- Sintaxe básica do SELECT
+- Como visualizar dados de uma tabela
+
+**Conceitos SQL:**
+- `SELECT`: comando para selecionar dados
+- `FROM`: especifica a tabela de origem
+- Seleção de colunas específicas
+
+**Resultado Esperado:**
+- **Total de linhas:** 200 (todos os produtos)
+- **Colunas retornadas:** `id_produto`, `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Exemplo de linha:**
+  ```
+  id_produto: prd_abc123def456
+  nome_produto: Smartphone Galaxy A54
+  categoria: Eletrônicos
+  marca: Samsung
+  preco_atual: 1299.90
+  ```
+- **Validação:** Verifique se todos os 200 produtos aparecem e se os nomes são produtos brasileiros reais
+
+---
+
+#### `exemplo-02-order-by.sql`
+**Conceito:** ORDER BY (Ordenação)  
+**Pergunta de Negócio:** Quais são os produtos mais caros?  
+**O que você aprende:**
+- Como ordenar resultados por uma ou mais colunas
+- Ordenação crescente (ASC) e decrescente (DESC)
+- Como organizar dados para análise
+
+**Conceitos SQL:**
+- `ORDER BY`: ordena os resultados
+- `ASC`: ordem crescente (padrão)
+- `DESC`: ordem decrescente
+
+**Resultado Esperado:**
+- **Total de linhas:** 200 (todos os produtos)
+- **Colunas retornadas:** `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Ordenação:** Do mais caro para o mais barato (DESC)
+- **Primeira linha:** Produto com maior `preco_atual` (pode variar, mas deve estar acima de R$ 500)
+- **Última linha:** Produto com menor `preco_atual` (geralmente próximo de R$ 29,90)
+- **Validação:** Verifique se os preços estão em ordem decrescente
+
+---
+
+#### `exemplo-03-limit.sql`
+**Conceito:** LIMIT (Limitar Resultados)  
+**Pergunta de Negócio:** Quais são os 10 primeiros produtos mais caros?  
+**O que você aprende:**
+- Como limitar a quantidade de registros retornados
+- Combinar LIMIT com ORDER BY para obter top N
+- Útil para análises de ranking
+
+**Conceitos SQL:**
+- `LIMIT`: limita o número de linhas retornadas
+- Combinação com `ORDER BY` para rankings
+
+**Resultado Esperado:**
+- **Total de linhas:** Exatamente 10 linhas
+- **Colunas retornadas:** `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Ordenação:** Do mais caro para o mais barato (DESC)
+- **Validação:** 
+  - Deve retornar exatamente 10 produtos
+  - Todos devem ter preço acima de R$ 500 (geralmente)
+  - Os preços devem estar em ordem decrescente
+
+---
+
+#### `exemplo-04-where.sql`
+**Conceito:** WHERE (Filtros)  
+**Pergunta de Negócio:** Quais produtos custam mais de R$ 500?  
+**O que você aprende:**
+- Como filtrar registros com condições
+- Operadores de comparação (>, <, =, >=, <=, !=)
+- Como combinar múltiplas condições (AND, OR)
+
+**Conceitos SQL:**
+- `WHERE`: filtra linhas baseado em condições
+- Operadores: `>`, `<`, `=`, `>=`, `<=`, `!=`, `<>`
+- Operadores lógicos: `AND`, `OR`, `NOT`
+
+**Resultado Esperado:**
+- **Total de linhas:** Aproximadamente 30-50 produtos (varia conforme dados gerados)
+- **Colunas retornadas:** `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Filtro aplicado:** Apenas produtos com `preco_atual > 500`
+- **Validação:** 
+  - Todas as linhas devem ter `preco_atual` maior que 500
+  - Nenhuma linha deve ter `preco_atual` menor ou igual a 500
 
 ---
 
 ### 📈 Nível 2: Agregações (Exemplo 5)
-- **`COUNT()`** - Contar registros
-- **`SUM()`** - Somar valores
-- **`AVG()`** - Calcular média
-- **`MAX()`** - Maior valor
-- **`MIN()`** - Menor valor
-- **`COUNT(DISTINCT)`** - Contar valores únicos
 
-**Exemplo prático:**
-```sql
-SELECT 
-    COUNT(*) AS total_vendas,
-    SUM(quantidade * preco_unitario) AS receita_total,
-    AVG(quantidade * preco_unitario) AS ticket_medio
-FROM vendas;
-```
+#### `exemplo-05-funcoes-agregacao.sql`
+**Conceito:** Funções de Agregação  
+**Pergunta de Negócio:** Qual é o total de vendas, receita total e ticket médio?  
+**O que você aprende:**
+- Como calcular totais, médias e contagens
+- Funções de agregação básicas e avançadas
+- Diferença entre COUNT(*) e COUNT(coluna)
+
+**Conceitos SQL:**
+- `COUNT()`: conta registros
+- `SUM()`: soma valores
+- `AVG()`: calcula média
+- `MAX()`: maior valor
+- `MIN()`: menor valor
+- `COUNT(DISTINCT)`: conta valores únicos
+
+**Exemplos incluídos:**
+- Total de vendas e receita
+- Maior e menor venda
+- Produtos e clientes únicos
+- Resumo completo de métricas
+
+**Resultado Esperado:**
+
+**5A - Total de Vendas e Receita:**
+- **Total de linhas:** 1 linha
+- **Colunas:** `total_vendas`, `total_unidades_vendidas`, `receita_total`, `ticket_medio`
+- **Valores esperados:**
+  - `total_vendas`: ~3.000 (varia conforme dados)
+  - `receita_total`: Valor em R$ (soma de todas as vendas)
+  - `ticket_medio`: Receita total / total de vendas
+
+**5B - MAX e MIN:**
+- **Total de linhas:** 1 linha
+- **Colunas:** `maior_venda`, `menor_venda`, `maior_preco_unitario`, `menor_preco_unitario`
+- **Validação:** `maior_venda` deve ser maior que `menor_venda`
+
+**5C - COUNT com DISTINCT:**
+- **Total de linhas:** 1 linha
+- **Colunas:** `produtos_diferentes_vendidos`, `clientes_unicos`, `total_vendas`
+- **Valores esperados:**
+  - `produtos_diferentes_vendidos`: ~185 produtos (alguns não são vendidos)
+  - `clientes_unicos`: ~50 clientes (todos compram)
+  - `total_vendas`: ~3.000
+
+**5D - Resumo Completo:**
+- **Total de linhas:** 1 linha
+- **Colunas:** Todas as métricas combinadas
+- **Validação:** Todos os valores devem fazer sentido (receita > 0, ticket médio razoável)
 
 ---
 
 ### 🔗 Nível 3: Relacionamentos (Exemplos 6, 8, 9)
-- **`INNER JOIN`** - Juntar tabelas (apenas matches)
-- **`LEFT JOIN`** - Incluir todos da esquerda
-- **`RIGHT JOIN`** - Incluir todos da direita
-- **`GROUP BY`** - Agrupar dados
-- **`HAVING`** - Filtrar grupos
 
-**Exemplo prático:**
-```sql
-SELECT 
-    p.categoria,
-    COUNT(v.id_venda) AS total_vendas,
-    SUM(v.quantidade * v.preco_unitario) AS receita_total
-FROM vendas v
-INNER JOIN produtos p ON v.id_produto = p.id_produto
-GROUP BY p.categoria
-HAVING receita_total > 50000
-ORDER BY receita_total DESC;
-```
+#### `exemplo-06-join.sql`
+**Conceito:** JOIN - Primeiro Passo  
+**Pergunta de Negócio:** Como ver o nome do produto junto com a venda?  
+**O que você aprende:**
+- O que é JOIN e por que é necessário
+- Como juntar duas tabelas pelo relacionamento
+- Diferença entre dados em tabelas separadas vs. juntos
+
+**Conceitos SQL:**
+- `INNER JOIN`: junta tabelas retornando apenas matches
+- Sintaxe: `FROM tabela1 t1 INNER JOIN tabela2 t2 ON t1.coluna = t2.coluna`
+- Aliases de tabela (apelidos)
+- Especificar tabela nas colunas (t.coluna)
+
+**Como funciona:**
+1. Pegamos uma linha da tabela da esquerda
+2. Procuramos correspondência na tabela da direita
+3. Combinamos as informações quando há match
+4. Resultado: uma linha com dados de ambas as tabelas
+
+**Resultado Esperado:**
+- **Total de linhas:** 10 linhas (LIMIT 10)
+- **Colunas retornadas:** `id_venda`, `id_produto`, `nome_produto`, `quantidade`
+- **Estrutura:** Cada linha combina dados de `vendas` e `produtos`
+- **Exemplo de linha:**
+  ```
+  id_venda: sal_xyz789
+  id_produto: prd_abc123
+  nome_produto: Smartphone Galaxy A54
+  quantidade: 1
+  ```
+- **Validação:** 
+  - Todas as linhas devem ter `nome_produto` preenchido (não NULL)
+  - O `id_produto` deve existir na tabela `produtos`
 
 ---
 
-### 🧠 Nível 4: Lógica Condicional (Exemplo 7)
-- **`CASE WHEN`** - Criar classificações e categorizações
+#### `exemplo-08-group-by-join.sql`
+**Conceito:** GROUP BY com JOIN  
+**Pergunta de Negócio:** Quantas vendas e qual a receita total por categoria de produto?  
+**O que você aprende:**
+- Como agrupar dados de tabelas juntadas
+- Combinar GROUP BY com JOIN
+- Calcular métricas agregadas por grupos de tabelas relacionadas
 
-**Exemplo prático:**
-```sql
-SELECT 
-    nome_produto,
-    preco_atual,
-    CASE 
-        WHEN preco_atual < 100 THEN 'Econômico'
-        WHEN preco_atual < 300 THEN 'Médio'
-        WHEN preco_atual < 600 THEN 'Alto'
-        ELSE 'Premium'
-    END AS faixa_preco
-FROM produtos;
-```
+**Conceitos SQL:**
+- `GROUP BY`: agrupa linhas por valores de colunas
+- Regra importante: todas as colunas no SELECT devem estar no GROUP BY ou serem funções de agregação
+- Múltiplas funções de agregação no mesmo SELECT
+
+**Progressão didática:**
+- 8A: Apenas categoria e total de vendas
+- 8B: Adiciona receita total
+- 8C: Análise completa (vendas, receita, preço médio)
+
+**Resultado Esperado:**
+
+**8A - Categoria e Total de Vendas:**
+- **Total de linhas:** ~10-11 linhas (uma por categoria)
+- **Colunas:** `categoria`, `total_vendas`
+- **Ordenação:** Do maior para o menor número de vendas
+- **Validação:** A soma de `total_vendas` deve ser igual ao total de vendas
+
+**8B - Adicionando Receita Total:**
+- **Total de linhas:** ~10-11 linhas
+- **Colunas:** `categoria`, `total_vendas`, `receita_total`
+- **Validação:** Categorias com mais vendas geralmente têm maior receita
+
+**8C - Análise Completa:**
+- **Total de linhas:** ~10-11 linhas
+- **Colunas:** `categoria`, `total_vendas`, `receita_total`, `preco_medio`
+- **Validação:** 
+  - `receita_total` = soma de todas as vendas da categoria
+  - `preco_medio` deve estar dentro da faixa de preços dos produtos
+
+---
+
+#### `exemplo-09-having-join.sql`
+**Conceito:** HAVING com JOIN  
+**Pergunta de Negócio:** Quais categorias geram mais de R$ 50.000 em receita?  
+**O que você aprende:**
+- Diferença entre WHERE e HAVING
+- Filtrar resultados após agrupamento
+- Aplicar condições em funções de agregação
+
+**Conceitos SQL:**
+- `HAVING`: filtra grupos após agrupamento (WHERE filtra linhas antes)
+- Usado com funções de agregação
+- Ordem: WHERE → GROUP BY → HAVING → ORDER BY
+
+**Diferença WHERE vs HAVING:**
+- `WHERE`: filtra linhas individuais ANTES do agrupamento
+- `HAVING`: filtra grupos DEPOIS do agrupamento
+
+**Resultado Esperado:**
+- **Total de linhas:** 1-5 linhas (apenas categorias com receita > R$ 50.000)
+- **Colunas:** `categoria`, `receita_total`
+- **Filtro:** Apenas categorias onde `receita_total > 50000`
+- **Validação:** 
+  - Todas as linhas devem ter `receita_total` maior que 50.000
+  - Geralmente categorias como "Eletrônicos" e "Informática" aparecem
+
+---
+
+### 🧠 Nível 4: Lógica e Transformações (Exemplo 7)
+
+#### `exemplo-07-case-when.sql`
+**Conceito:** CASE WHEN (Lógica Condicional)  
+**Pergunta de Negócio:** Classifique os produtos por faixa de preço  
+**O que você aprende:**
+- Como criar classificações e categorizações
+- Lógica condicional em SQL
+- Criar novas colunas baseadas em condições
+
+**Conceitos SQL:**
+- `CASE WHEN`: estrutura condicional (como IF/ELSE)
+- Sintaxe: `CASE WHEN condição THEN valor ELSE outro_valor END`
+- Múltiplas condições com WHEN/THEN
+- Criar colunas calculadas com lógica
+
+**Casos de uso:**
+- Classificações (Econômico, Médio, Alto, Premium)
+- Segmentações
+- Transformações de dados
+- Flags e indicadores
+
+**Resultado Esperado:**
+- **Total de linhas:** 200 (todos os produtos)
+- **Colunas:** `nome_produto`, `preco_atual`, `faixa_preco`
+- **Classificações:**
+  - `Econômico`: preço < R$ 100
+  - `Médio`: preço entre R$ 100 e R$ 300
+  - `Alto`: preço entre R$ 300 e R$ 600
+  - `Premium`: preço >= R$ 600
+- **Ordenação:** Do mais caro para o mais barato
+- **Validação:** 
+  - Produtos com preço < 100 devem ter `faixa_preco = 'Econômico'`
+  - Produtos com preço >= 600 devem ter `faixa_preco = 'Premium'`
 
 ---
 
 ### 🚀 Nível 5: Queries Avançadas (Exemplos 12-15)
-- **Subquery** - Query dentro de query
-- **CTE (WITH)** - Organizar queries complexas em partes
-- **LEFT JOIN / RIGHT JOIN** - Incluir todos os registros mesmo sem match
 
-**Exemplo prático (CTE):**
+#### `exemplo-12-subquery.sql`
+**Conceito:** Subquery (Query Dentro de Query)  
+**Pergunta de Negócio:** Quais produtos têm preço acima da média geral?  
+**O que você aprende:**
+- Como usar resultado de uma query dentro de outra
+- Subqueries na cláusula WHERE
+- Calcular valores dinâmicos para comparação
+
+**Conceitos SQL:**
+- Subquery: query aninhada dentro de outra
+- Subquery na cláusula WHERE
+- Subquery retorna um único valor (escalar)
+- Executada primeiro, resultado usado na query externa
+
+**Vantagens:**
+- Permite comparações dinâmicas
+- Reutiliza cálculos complexos
+- Mais legível que múltiplas queries
+
+**Limitações:**
+- Pode ser mais lento que JOINs
+- Menos flexível que CTEs
+
+**Resultado Esperado:**
+- **Total de linhas:** ~100-150 produtos (produtos acima da média)
+- **Colunas:** `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Filtro:** Apenas produtos onde `preco_atual > média geral`
+- **Ordenação:** Do mais caro para o mais barato
+- **Validação:** 
+  - Todos os produtos devem ter preço acima da média geral
+  - A média geral pode ser calculada separadamente para verificar
+
+---
+
+#### `exemplo-13-cte-with.sql`
+**Conceito:** CTE (WITH) - Common Table Expressions  
+**Pergunta de Negócio:** Quais produtos estão mais caros que a média dos concorrentes?  
+**O que você aprende:**
+- Como organizar queries complexas em partes
+- Criar "tabelas temporárias" nomeadas
+- Melhorar legibilidade de queries complexas
+
+**Conceitos SQL:**
+- `WITH nome AS (query)`: define uma CTE
+- Múltiplas CTEs podem ser encadeadas
+- CTEs são usadas apenas na query seguinte
+- Mais legível que subqueries aninhadas
+
+**Vantagens sobre Subquery:**
+- Mais legível e organizado
+- Pode ser referenciada múltiplas vezes
+- Facilita manutenção
+- Melhor performance que subqueries repetidas
+
+**Sintaxe:**
 ```sql
-WITH receita_por_cliente AS (
-    SELECT 
-        id_cliente,
-        SUM(quantidade * preco_unitario) AS receita_total
-    FROM vendas
-    GROUP BY id_cliente
+WITH nome_cte AS (
+    SELECT ...
 )
-SELECT 
-    c.nome_cliente,
-    rpc.receita_total,
-    CASE 
-        WHEN rpc.receita_total >= 10000 THEN 'VIP'
-        WHEN rpc.receita_total >= 5000 THEN 'TOP_TIER'
-        ELSE 'REGULAR'
-    END AS segmento
-FROM clientes c
-INNER JOIN receita_por_cliente rpc ON c.id_cliente = rpc.id_cliente;
+SELECT ... FROM nome_cte ...
 ```
+
+**Resultado Esperado:**
+- **Total de linhas:** ~20-30 produtos (produtos acima da média dos concorrentes)
+- **Colunas:** `nome_produto`, `categoria`, `nosso_preco`, `preco_medio_concorrente`, `preco_minimo_concorrente`, `diferenca_media`
+- **Filtro:** Apenas produtos onde nosso preço > média dos concorrentes
+- **Ordenação:** Maior diferença primeiro
+- **Validação:** 
+  - `nosso_preco` deve ser maior que `preco_medio_concorrente`
+  - `diferenca_media` deve ser positiva
+  - Produtos de tênis devem aparecer (têm preço o dobro dos concorrentes)
+
+---
+
+#### `exemplo-14-right-join.sql`
+**Conceito:** RIGHT JOIN  
+**Pergunta de Negócio:** Quais vendas foram feitas de produtos não cadastrados?  
+**O que você aprende:**
+- Incluir todos os registros da tabela direita, mesmo sem match
+- Identificar problemas de integridade de dados
+- Diferença entre INNER JOIN e RIGHT JOIN
+
+**Conceitos SQL:**
+- `RIGHT JOIN`: retorna TODOS os registros da tabela direita
+- Adiciona dados da esquerda quando há correspondência
+- Valores NULL quando não há match na esquerda
+
+**Casos de negócio:**
+- Identificar vendas de produtos não cadastrados
+- Detectar problemas de integridade de dados
+- Encontrar registros órfãos
+
+**Diferença dos JOINs:**
+- `INNER JOIN`: apenas matches em ambas as tabelas
+- `LEFT JOIN`: todos da esquerda + matches da direita
+- `RIGHT JOIN`: todos da direita + matches da esquerda
+
+**Resultado Esperado:**
+
+**14A - Todas as Vendas:**
+- **Total de linhas:** 30 linhas (LIMIT 30)
+- **Colunas:** `id_venda`, `data_venda`, `id_produto`, `nome_produto`, `categoria`, `quantidade`, `preco_unitario`, `receita_venda`
+- **Validação:** 
+  - Algumas linhas podem ter `nome_produto = NULL` (vendas de produtos não cadastrados)
+  - Vendas ordenadas por data mais recente
+
+**14B - Vendas Não Cadastradas:**
+- **Total de linhas:** ~20 linhas (N_SALES_UNREGISTERED)
+- **Colunas:** `id_produto`, `total_vendas`, `total_quantidade`, `receita_total`, `preco_medio`
+- **Validação:** 
+  - Todos os `id_produto` não devem existir na tabela `produtos`
+  - `total_vendas` deve ser >= 1 para cada produto
+
+---
+
+#### `exemplo-15-left-join.sql`
+**Conceito:** LEFT JOIN  
+**Pergunta de Negócio:** Quais produtos nunca foram vendidos?  
+**O que você aprende:**
+- Incluir todos os registros da tabela esquerda, mesmo sem match
+- Identificar produtos sem vendas
+- Usar LEFT JOIN para análises de cobertura
+
+**Conceitos SQL:**
+- `LEFT JOIN`: retorna TODOS os registros da tabela esquerda
+- Adiciona dados da direita quando há correspondência
+- Valores NULL quando não há match na direita
+
+**Casos de negócio:**
+- Produtos cadastrados que nunca geraram venda
+- Clientes que nunca compraram
+- Identificar oportunidades de marketing
+
+**Exemplos incluídos:**
+- 15A: Todos os produtos com suas vendas (ou NULL)
+- 15B: Produtos que NUNCA foram vendidos (HAVING COUNT = 0)
+
+**Resultado Esperado:**
+
+**15A - Todos os Produtos:**
+- **Total de linhas:** 200 linhas (todos os produtos)
+- **Colunas:** `id_produto`, `nome_produto`, `categoria`, `preco_atual`, `total_vendas`
+- **Ordenação:** Do menor para o maior número de vendas
+- **Validação:** 
+  - Alguns produtos terão `total_vendas = 0` (nunca vendidos)
+  - Produtos de tênis devem ter pouquíssimas ou nenhuma venda
+
+**15B - Produtos Nunca Vendidos:**
+- **Total de linhas:** ~15-30 produtos (incluindo os 15 tênis + alguns outros)
+- **Colunas:** `id_produto`, `nome_produto`, `categoria`, `preco_atual`, `total_vendas`
+- **Filtro:** Apenas produtos com `total_vendas = 0`
+- **Validação:** 
+  - Todos devem ter `total_vendas = 0`
+  - Muitos produtos de tênis devem aparecer aqui
 
 ---
 
 ### 💰 Nível 6: Análises de Negócio (Exemplos 16-18)
-- Comparação de preços com concorrentes
-- Cálculo de percentuais
-- Queries complexas combinando todos os conceitos
+
+#### `exemplo-16-produtos-mais-baratos-concorrente.sql`
+**Conceito:** Comparação de Preços com Concorrentes  
+**Pergunta de Negócio:** Quais produtos estão mais baratos no concorrente do que na nossa tabela?  
+**O que você aprende:**
+- Comparar preços entre tabelas diferentes
+- Calcular diferenças absolutas e percentuais
+- Identificar oportunidades de ajuste de preço
+
+**Conceitos SQL:**
+- JOIN entre produtos e preços de concorrentes
+- Cálculo de diferenças (absoluta e percentual)
+- `ROUND()` para formatar números
+- Filtros com comparações entre tabelas
+
+**Casos de negócio:**
+- Análise competitiva de preços
+- Identificar produtos com preço acima do mercado
+- Decisões de ajuste de preço
+- Negociação com fornecedores
+
+**Resultado Esperado:**
+- **Total de linhas:** ~30 linhas (LIMIT 30)
+- **Colunas:** `id_produto`, `nome_produto`, `categoria`, `marca`, `nosso_preco`, `nome_concorrente`, `preco_concorrente`, `diferenca_absoluta`, `percentual_mais_caro`
+- **Filtro:** Apenas produtos onde nosso preço > preço do concorrente
+- **Ordenação:** Maior percentual de diferença primeiro
+- **Validação:** 
+  - `percentual_mais_caro` deve ser positivo
+  - Produtos de tênis devem aparecer no topo (preço o dobro = 100% mais caro)
+  - `diferenca_absoluta = nosso_preco - preco_concorrente`
+
+---
+
+#### `exemplo-17-agregacoes-avancadas.sql`
+**Conceito:** Agregações Avançadas (ROUND, Percentuais)  
+**Pergunta de Negócio:** Qual é a distribuição percentual de receita por canal?  
+**O que você aprende:**
+- Calcular percentuais
+- Usar subqueries em cálculos
+- Formatar números com ROUND
+
+**Conceitos SQL:**
+- `ROUND(valor, casas_decimais)`: arredonda números
+- Cálculo de percentuais: `(parte / total) * 100`
+- Subquery para calcular total geral
+- Agregações com formatação
+
+**Casos de negócio:**
+- Distribuição de receita por canal
+- Participação percentual de categorias
+- Análise de mix de produtos
+
+**Resultado Esperado:**
+- **Total de linhas:** 2 linhas (ecommerce e loja_fisica)
+- **Colunas:** `canal_venda`, `total_vendas`, `receita_total`, `percentual_receita`
+- **Valores esperados:**
+  - `ecommerce`: ~72% da receita
+  - `loja_fisica`: ~28% da receita
+  - `percentual_receita`: Soma deve ser 100% (ou próximo)
+- **Validação:** 
+  - A soma dos percentuais deve ser 100%
+  - `receita_total` do ecommerce deve ser maior que loja_fisica
+
+---
+
+#### `exemplo-18-query-completa.sql`
+**Conceito:** Query Completa (Todos os Conceitos)  
+**Pergunta de Negócio:** Quais produtos top sellers estão mais caros que todos os concorrentes?  
+**O que você aprende:**
+- Combinar múltiplos conceitos em uma análise complexa
+- CTEs múltiplas
+- JOINs, agregações, CASE WHEN, cálculos percentuais
+
+**Conceitos SQL:**
+- Múltiplas CTEs encadeadas
+- JOIN entre CTEs
+- Agregações complexas
+- CASE WHEN para classificações
+- Cálculos percentuais
+
+**Estrutura:**
+1. CTE 1: Produtos top vendas (com receita)
+2. CTE 2: Preços de concorrentes (mínimo e médio)
+3. Query final: Combina tudo com classificações
+
+**Resultado Esperado:**
+- **Total de linhas:** ~10-20 produtos (top sellers acima do mercado)
+- **Colunas:** `nome_produto`, `categoria`, `nosso_preco`, `preco_minimo_concorrente`, `preco_medio_concorrente`, `receita_total`, `status_preco`, `percentual_diferenca`
+- **Filtro:** Apenas produtos top sellers onde nosso preço > preço mínimo do concorrente
+- **Classificação:**
+  - `status_preco`: "Acima do mercado" (todos devem ter esse status)
+- **Ordenação:** Maior percentual de diferença primeiro
+- **Validação:** 
+  - Todos devem ter `status_preco = 'Acima do mercado'`
+  - `percentual_diferenca` deve ser positivo
+  - Produtos ordenados por maior diferença percentual
 
 ---
 
 ### 🏗️ Nível 7: Estruturas de Dados (Exemplos 19-21)
-- **`CREATE VIEW`** - Criar visão (query armazenada)
-- **`CREATE TABLE`** - Criar tabela física
-- **`CREATE TEMP VIEW`** - Criar visão temporária
+
+#### `exemplo-19-criar-view.sql`
+**Conceito:** Criar VIEW (Visão)  
+**Pergunta de Negócio:** Como criar uma visão para produtos com vendas?  
+**O que você aprende:**
+- O que é uma VIEW e quando usar
+- Como criar e usar views
+- Vantagens e limitações
+
+**Conceitos SQL:**
+- `CREATE VIEW nome AS (query)`: cria uma view
+- `SELECT * FROM nome_view`: usa como tabela
+- `DROP VIEW nome_view`: remove a view
+
+**O que é uma VIEW:**
+- Query armazenada que se comporta como tabela
+- Não armazena dados, executa query toda vez
+- Simplifica queries complexas
+
+**Vantagens:**
+- Simplifica queries complexas
+- Facilita manutenção
+- Controla acesso a dados
+- Abstrai complexidade
+
+**Quando usar:**
+- Query complexa usada várias vezes
+- Simplificar acesso para outros usuários
+- Controlar quais dados são visíveis
+
+**Resultado Esperado:**
+- **Ação:** VIEW criada com sucesso
+- **Para usar a VIEW:**
+  ```sql
+  SELECT * FROM produtos_com_vendas LIMIT 10;
+  ```
+- **Resultado da VIEW:**
+  - **Total de linhas:** 200 (todos os produtos)
+  - **Colunas:** `id_produto`, `nome_produto`, `categoria`, `marca`, `preco_atual`, `total_vendas`, `receita_total`
+  - **Validação:** 
+    - Produtos sem vendas terão `total_vendas = 0` e `receita_total = 0`
+    - Produtos com vendas terão valores > 0
 
 ---
 
-## 🚀 Como Começar
+#### `exemplo-20-criar-tabela.sql`
+**Conceito:** Criar TABELA  
+**Pergunta de Negócio:** Como criar uma tabela para armazenar resumo de vendas por categoria?  
+**O que você aprende:**
+- Como criar tabelas físicas
+- Inserir dados em tabelas
+- Diferença entre VIEW e TABLE
 
-### Passo 1: Gerar os Datasets
+**Conceitos SQL:**
+- `CREATE TABLE nome (colunas)`: cria tabela
+- `INSERT INTO tabela SELECT ...`: insere dados de query
+- `DROP TABLE nome`: remove tabela
+- `PRIMARY KEY`: chave primária
+- `DEFAULT`: valor padrão
 
-```bash
-# Na raiz do projeto
-python generate_datasets.py
-```
+**O que é uma TABELA:**
+- Estrutura física que armazena dados no disco
+- Dados persistem após desconectar
+- Pode ser indexada para performance
 
-Os CSVs serão gerados na pasta `data/`:
-- `produtos.csv`
-- `clientes.csv`
-- `vendas.csv`
-- `preco_competidores.csv`
+**Vantagens:**
+- Dados armazenados fisicamente (mais rápido)
+- Pode ser indexada
+- Pode ter constraints
+- Dados persistem
+
+**Quando usar:**
+- Dados consultados muitas vezes
+- Melhorar performance
+- Dados históricos ou agregados
+- Precisa de constraints
+
+**Diferença VIEW vs TABLE:**
+- **VIEW**: não armazena dados, apenas query (mais lento, não ocupa espaço)
+- **TABLE**: armazena dados físicos (mais rápido, ocupa espaço)
+
+**Resultado Esperado:**
+- **Ação:** Tabela criada e dados inseridos
+- **Para consultar a tabela:**
+  ```sql
+  SELECT * FROM resumo_vendas_categoria ORDER BY receita_total DESC;
+  ```
+- **Resultado:**
+  - **Total de linhas:** ~10-11 linhas (uma por categoria)
+  - **Colunas:** `categoria`, `total_vendas`, `receita_total`, `data_atualizacao`
+  - **Validação:** 
+    - Cada categoria aparece uma vez
+    - `data_atualizacao` deve ter a data/hora atual
+    - Valores devem corresponder aos dados de vendas
 
 ---
 
-### Passo 2: Importar os Dados no Banco
+#### `exemplo-21-criar-temp-view.sql`
+**Conceito:** Criar TEMP VIEW (Visão Temporária)  
+**Pergunta de Negócio:** Como criar uma visão temporária para análise rápida?  
+**O que você aprende:**
+- O que é uma TEMP VIEW
+- Quando usar views temporárias
+- Diferença entre VIEW, TEMP VIEW e TABLE
 
-#### Opção A: SQLite (Recomendado para iniciantes)
+**Conceitos SQL:**
+- `CREATE TEMP VIEW nome AS (query)`: cria view temporária
+- Removida automaticamente ao desconectar
+- `DROP VIEW nome`: remove manualmente
+
+**O que é uma TEMP VIEW:**
+- View que existe apenas durante a sessão
+- Removida automaticamente ao desconectar
+- Útil para análises temporárias
+
+**Vantagens:**
+- Não polui o banco (removida automaticamente)
+- Útil para testes
+- Não precisa limpar depois
+- Cada sessão pode ter sua própria
+
+**Quando usar:**
+- Análises temporárias
+- Testes de queries
+- Análises exploratórias
+- Não quer deixar "lixo" no banco
+
+**Comparação:**
+- **VIEW**: permanente, precisa DROP para remover
+- **TEMP VIEW**: temporária, removida automaticamente
+- **TABLE**: permanente, armazena dados físicos
+
+**Resultado Esperado:**
+- **Ação:** TEMP VIEW criada com sucesso
+- **Para usar a TEMP VIEW:**
+  ```sql
+  SELECT * FROM produtos_mais_vendidos_temp LIMIT 20;
+  ```
+- **Resultado:**
+  - **Total de linhas:** ~50-100 produtos (apenas com mais de 10 vendas)
+  - **Colunas:** `id_produto`, `nome_produto`, `categoria`, `total_vendas`, `receita_total`
+  - **Filtro:** Apenas produtos com `total_vendas > 10`
+  - **Ordenação:** Maior receita primeiro
+  - **Validação:** 
+    - Todos devem ter `total_vendas > 10`
+    - Produtos ordenados por receita decrescente
+    - A TEMP VIEW será removida automaticamente ao desconectar
+
+---
+
+## 🎓 Como Usar
+
+### 1. Importe os CSVs em um banco SQL
 
 ```bash
-# Criar banco de dados
+# SQLite
 sqlite3 ecommerce.db
-
-# Configurar modo CSV
 .mode csv
-
-# Importar os arquivos
 .import data/produtos.csv produtos
 .import data/clientes.csv clientes
 .import data/vendas.csv vendas
 .import data/preco_competidores.csv preco_competidores
-
-# Verificar se importou corretamente
-SELECT COUNT(*) FROM produtos;
-SELECT COUNT(*) FROM clientes;
-SELECT COUNT(*) FROM vendas;
-SELECT COUNT(*) FROM preco_competidores;
 ```
 
-#### Opção B: PostgreSQL
-
 ```sql
--- Criar tabelas
-CREATE TABLE produtos (
-    id_produto TEXT,
-    nome_produto TEXT,
-    categoria TEXT,
-    marca TEXT,
-    preco_atual REAL,
-    data_criacao TEXT
-);
-
-CREATE TABLE clientes (
-    id_cliente TEXT,
-    nome_cliente TEXT,
-    estado TEXT,
-    pais TEXT,
-    data_cadastro TEXT
-);
-
-CREATE TABLE vendas (
-    id_venda TEXT,
-    data_venda TEXT,
-    id_cliente TEXT,
-    id_produto TEXT,
-    canal_venda TEXT,
-    quantidade INTEGER,
-    preco_unitario REAL
-);
-
-CREATE TABLE preco_competidores (
-    id_produto TEXT,
-    nome_concorrente TEXT,
-    preco_concorrente REAL,
-    data_coleta TEXT
-);
-
--- Importar CSVs
+-- PostgreSQL
 COPY produtos FROM 'data/produtos.csv' WITH CSV HEADER;
 COPY clientes FROM 'data/clientes.csv' WITH CSV HEADER;
 COPY vendas FROM 'data/vendas.csv' WITH CSV HEADER;
 COPY preco_competidores FROM 'data/preco_competidores.csv' WITH CSV HEADER;
 ```
 
----
+### 2. Execute as queries em ordem
 
-### Passo 3: Executar os Exemplos em Ordem
-
-Vá para a pasta `queries/` e execute os exemplos em ordem:
+Comece pelo `exemplo-01` e vá progredindo. Cada exemplo constrói sobre o anterior.
 
 ```bash
-# SQLite
-sqlite3 ecommerce.db < queries/exemplo-01-select-basico.sql
-sqlite3 ecommerce.db < queries/exemplo-02-order-by.sql
-# ... e assim por diante
+# Executar um exemplo
+sqlite3 ecommerce.db < exemplo-01-select-basico.sql
+
+# Ou copie e cole no cliente SQL
 ```
 
-Ou copie e cole cada query no seu cliente SQL.
+### 3. Analise os resultados
 
----
-
-## 📚 Estrutura dos Exemplos
-
-Temos **21 exemplos SQL** organizados em progressão didática:
-
-1. **Exemplos 1-4:** Fundamentos (SELECT, WHERE, ORDER BY, LIMIT)
-2. **Exemplo 5:** Funções de Agregação (COUNT, SUM, AVG, MAX, MIN)
-3. **Exemplos 6, 8, 9:** JOINs e Agrupamentos
-4. **Exemplo 7:** CASE WHEN (Lógica Condicional)
-5. **Exemplos 12-13:** Subquery e CTE
-6. **Exemplos 14-15:** LEFT JOIN e RIGHT JOIN
-7. **Exemplos 16-18:** Análises de Negócio
-8. **Exemplos 19-21:** VIEW, TABLE, TEMP VIEW
-
-**Cada exemplo:**
-- Introduz um novo conceito SQL
-- Responde uma pergunta de negócio real
-- Tem comentários explicativos
-- Constrói sobre os exemplos anteriores
-
----
-
-## 🎯 Perguntas de Negócio que Vamos Responder
-
-### Análise Interna
-1. Quais são os 10 produtos que mais vendem?
-2. Quem são os clientes que mais compram?
-3. Qual canal de venda gera mais receita?
-4. Qual categoria de produto é mais lucrativa?
-5. Quais produtos nunca foram vendidos?
-
-### Análise de Mercado
-1. Quais produtos estão mais caros que a concorrência?
-2. Qual concorrente tem os preços mais baixos?
-3. Quais produtos top sellers estão com preço acima do mercado?
-4. Qual é a diferença média de preço entre nós e os concorrentes?
-
-### Segmentação de Clientes
-1. Como criar segmentação de clientes (VIP, TOP_TIER, REGULAR) usando CASE WHEN?
-2. Qual segmento gera mais receita?
-3. Qual é o ticket médio por segmento?
+- Os números fazem sentido?
+- O que isso significa para o negócio?
+- Como posso modificar para responder outras perguntas?
 
 ---
 
@@ -425,95 +1077,76 @@ Após fazer todos os exemplos, você deve ser capaz de:
 - [ ] Calcular percentuais e diferenças
 - [ ] Comparar dados entre tabelas
 - [ ] Criar views e tabelas
+- [ ] Usar views temporárias
 
 ---
 
-## 💡 Dicas Importantes
+## 💡 Dicas
 
-### Durante a Aula
 - **Execute em ordem:** Cada exemplo introduz um conceito novo
 - **Modifique:** Tente adaptar as queries para responder outras perguntas
+- **Combine:** Use conceitos de exemplos anteriores em novos contextos
 - **Valide:** Sempre verifique se os resultados fazem sentido
-- **Pergunte:** "Por que isso importa para o negócio?"
-
-### Comandos Úteis
-
-**SQLite:**
-```bash
-# Ver estrutura de uma tabela
-.schema produtos
-
-# Ver primeiras linhas
-SELECT * FROM produtos LIMIT 10;
-
-# Verificar quantos registros
-SELECT COUNT(*) FROM produtos;
-
-# Sair do SQLite
-.quit
-```
-
-**PostgreSQL:**
-```sql
--- Ver estrutura de uma tabela
-\d produtos
-
--- Ver primeiras linhas
-SELECT * FROM produtos LIMIT 10;
-
--- Verificar quantos registros
-SELECT COUNT(*) FROM produtos;
-```
+- **Pratique:** Crie suas próprias queries baseadas nos exemplos
 
 ---
 
-## 🐛 Troubleshooting
+## 🐛 Notas Técnicas
 
-### Erro: "no such table: produtos"
-**Solução:** Verifique se importou os CSVs corretamente. Use `.tables` (SQLite) ou `\dt` (PostgreSQL) para listar tabelas.
+### Diferenças entre SQLite e PostgreSQL
 
-### Erro: "ambiguous column name"
-**Solução:** Especifique a tabela: `produtos.nome_produto` ao invés de apenas `nome_produto` quando há JOIN.
+- **Funções:**
+  - `ROUND()` funciona igual em ambos
+  - `COUNT()`, `SUM()`, `AVG()` funcionam igual em ambos
+  - `JOIN` funciona igual em ambos
 
-### Erro: "column must appear in GROUP BY"
-**Solução:** Todas as colunas no SELECT que não são funções de agregação devem estar no GROUP BY.
+- **Importação de CSVs:**
+  - **SQLite:** `.import data/produtos.csv produtos`
+  - **PostgreSQL:** `COPY produtos FROM 'data/produtos.csv' WITH CSV HEADER;`
 
----
+- **Views e Tabelas:**
+  - Sintaxe similar em ambos
+  - PostgreSQL tem mais recursos avançados
 
-## 📚 Material Complementar
-
-- **[Queries de Exemplo](./queries/README.md)** - Guia completo com todos os 21 exemplos
-- **[KPIs da Aula 1](./KPIS.md)** - Lista completa de KPIs e perguntas de negócio
-- **[Estrutura dos Dados](./ESTRUTURA_DADOS.md)** - Documentação detalhada dos datasets
-- **[Exercícios](./exercicios/)** - Exercícios práticos para fixar o aprendizado
-
----
-
-## 🎯 Resultado Esperado
-
-Ao final do **Dia 1**, você terá:
-
-✅ **Conhecimento prático de SQL** aplicado a negócios reais  
-✅ **21 exemplos funcionais** que você pode adaptar  
-✅ **Capacidade de responder perguntas de negócio** usando dados  
-✅ **Base sólida** para os próximos dias da imersão  
+- Sempre valide os resultados manualmente
 
 ---
 
-## 💡 Frase de Ouro
+## 🎯 Próximos Passos
 
-> **"Você não está aprendendo SQL. Você está aprendendo como dados resolvem problemas reais."**
+Depois de dominar todos os exemplos:
 
-Cada query que você escrever deve responder uma pergunta de negócio. Sempre pergunte: **"Por que isso importa?"**
+1. Pratique criando suas próprias queries
+2. Combine conceitos de diferentes exemplos
+3. Explore os dados para responder novas perguntas de negócio
+4. Avance para a **Aula 2: Python & Ingestão de Dados**
 
 ---
 
-## 🚀 Próximo Passo
+## 📊 Resumo dos Conceitos por Exemplo
 
-Depois de dominar o **Dia 1 (SQL & Analytics)**, você estará pronto para:
+| Exemplo | Conceito Principal | Nível |
+|---------|-------------------|-------|
+| 01 | SELECT básico | Fundamentos |
+| 02 | ORDER BY | Fundamentos |
+| 03 | LIMIT | Fundamentos |
+| 04 | WHERE | Fundamentos |
+| 05 | Funções de Agregação | Agregações |
+| 06 | JOIN | Relacionamentos |
+| 07 | CASE WHEN | Lógica |
+| 08 | GROUP BY com JOIN | Relacionamentos |
+| 09 | HAVING com JOIN | Relacionamentos |
+| 12 | Subquery | Avançado |
+| 13 | CTE (WITH) | Avançado |
+| 14 | RIGHT JOIN | Avançado |
+| 15 | LEFT JOIN | Avançado |
+| 16 | Comparação de Preços | Negócio |
+| 17 | Agregações Avançadas | Negócio |
+| 18 | Query Completa | Negócio |
+| 19 | CREATE VIEW | Estruturas |
+| 20 | CREATE TABLE | Estruturas |
+| 21 | CREATE TEMP VIEW | Estruturas |
 
-- **Dia 2:** Python & Ingestão de Dados
-- **Dia 3:** Engenharia de Dados
-- **Dia 4:** Inteligência Artificial
+---
 
-**Boa jornada! 🚀**
+**Total: 21 exemplos práticos cobrindo SQL do básico ao avançado!** 🚀
