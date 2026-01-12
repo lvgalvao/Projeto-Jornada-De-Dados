@@ -21,6 +21,19 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 - `FROM`: especifica a tabela de origem
 - Seleção de colunas específicas
 
+**Resultado Esperado:**
+- **Total de linhas:** 200 (todos os produtos)
+- **Colunas retornadas:** `id_produto`, `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Exemplo de linha:**
+  ```
+  id_produto: prd_abc123def456
+  nome_produto: Smartphone Galaxy A54
+  categoria: Eletrônicos
+  marca: Samsung
+  preco_atual: 1299.90
+  ```
+- **Validação:** Verifique se todos os 200 produtos aparecem e se os nomes são produtos brasileiros reais
+
 ---
 
 #### `exemplo-02-order-by.sql`
@@ -36,6 +49,14 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 - `ASC`: ordem crescente (padrão)
 - `DESC`: ordem decrescente
 
+**Resultado Esperado:**
+- **Total de linhas:** 200 (todos os produtos)
+- **Colunas retornadas:** `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Ordenação:** Do mais caro para o mais barato (DESC)
+- **Primeira linha:** Produto com maior `preco_atual` (pode variar, mas deve estar acima de R$ 500)
+- **Última linha:** Produto com menor `preco_atual` (geralmente próximo de R$ 29,90)
+- **Validação:** Verifique se os preços estão em ordem decrescente
+
 ---
 
 #### `exemplo-03-limit.sql`
@@ -49,6 +70,15 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 **Conceitos SQL:**
 - `LIMIT`: limita o número de linhas retornadas
 - Combinação com `ORDER BY` para rankings
+
+**Resultado Esperado:**
+- **Total de linhas:** Exatamente 10 linhas
+- **Colunas retornadas:** `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Ordenação:** Do mais caro para o mais barato (DESC)
+- **Validação:** 
+  - Deve retornar exatamente 10 produtos
+  - Todos devem ter preço acima de R$ 500 (geralmente)
+  - Os preços devem estar em ordem decrescente
 
 ---
 
@@ -64,6 +94,14 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 - `WHERE`: filtra linhas baseado em condições
 - Operadores: `>`, `<`, `=`, `>=`, `<=`, `!=`, `<>`
 - Operadores lógicos: `AND`, `OR`, `NOT`
+
+**Resultado Esperado:**
+- **Total de linhas:** Aproximadamente 30-50 produtos (varia conforme dados gerados)
+- **Colunas retornadas:** `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Filtro aplicado:** Apenas produtos com `preco_atual > 500`
+- **Validação:** 
+  - Todas as linhas devem ter `preco_atual` maior que 500
+  - Nenhuma linha deve ter `preco_atual` menor ou igual a 500
 
 ---
 
@@ -91,6 +129,34 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 - Produtos e clientes únicos
 - Resumo completo de métricas
 
+**Resultado Esperado:**
+
+**5A - Total de Vendas e Receita:**
+- **Total de linhas:** 1 linha
+- **Colunas:** `total_vendas`, `total_unidades_vendidas`, `receita_total`, `ticket_medio`
+- **Valores esperados:**
+  - `total_vendas`: ~3.000 (varia conforme dados)
+  - `receita_total`: Valor em R$ (soma de todas as vendas)
+  - `ticket_medio`: Receita total / total de vendas
+
+**5B - MAX e MIN:**
+- **Total de linhas:** 1 linha
+- **Colunas:** `maior_venda`, `menor_venda`, `maior_preco_unitario`, `menor_preco_unitario`
+- **Validação:** `maior_venda` deve ser maior que `menor_venda`
+
+**5C - COUNT com DISTINCT:**
+- **Total de linhas:** 1 linha
+- **Colunas:** `produtos_diferentes_vendidos`, `clientes_unicos`, `total_vendas`
+- **Valores esperados:**
+  - `produtos_diferentes_vendidos`: ~185 produtos (alguns não são vendidos)
+  - `clientes_unicos`: ~50 clientes (todos compram)
+  - `total_vendas`: ~3.000
+
+**5D - Resumo Completo:**
+- **Total de linhas:** 1 linha
+- **Colunas:** Todas as métricas combinadas
+- **Validação:** Todos os valores devem fazer sentido (receita > 0, ticket médio razoável)
+
 ---
 
 ### 🔗 Nível 3: Relacionamentos (Exemplos 6, 8, 9)
@@ -115,6 +181,21 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 3. Combinamos as informações quando há match
 4. Resultado: uma linha com dados de ambas as tabelas
 
+**Resultado Esperado:**
+- **Total de linhas:** 10 linhas (LIMIT 10)
+- **Colunas retornadas:** `id_venda`, `id_produto`, `nome_produto`, `quantidade`
+- **Estrutura:** Cada linha combina dados de `vendas` e `produtos`
+- **Exemplo de linha:**
+  ```
+  id_venda: sal_xyz789
+  id_produto: prd_abc123
+  nome_produto: Smartphone Galaxy A54
+  quantidade: 1
+  ```
+- **Validação:** 
+  - Todas as linhas devem ter `nome_produto` preenchido (não NULL)
+  - O `id_produto` deve existir na tabela `produtos`
+
 ---
 
 #### `exemplo-08-group-by-join.sql`
@@ -135,6 +216,26 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 - 8B: Adiciona receita total
 - 8C: Análise completa (vendas, receita, preço médio)
 
+**Resultado Esperado:**
+
+**8A - Categoria e Total de Vendas:**
+- **Total de linhas:** ~10-11 linhas (uma por categoria)
+- **Colunas:** `categoria`, `total_vendas`
+- **Ordenação:** Do maior para o menor número de vendas
+- **Validação:** A soma de `total_vendas` deve ser igual ao total de vendas
+
+**8B - Adicionando Receita Total:**
+- **Total de linhas:** ~10-11 linhas
+- **Colunas:** `categoria`, `total_vendas`, `receita_total`
+- **Validação:** Categorias com mais vendas geralmente têm maior receita
+
+**8C - Análise Completa:**
+- **Total de linhas:** ~10-11 linhas
+- **Colunas:** `categoria`, `total_vendas`, `receita_total`, `preco_medio`
+- **Validação:** 
+  - `receita_total` = soma de todas as vendas da categoria
+  - `preco_medio` deve estar dentro da faixa de preços dos produtos
+
 ---
 
 #### `exemplo-09-having-join.sql`
@@ -153,6 +254,14 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 **Diferença WHERE vs HAVING:**
 - `WHERE`: filtra linhas individuais ANTES do agrupamento
 - `HAVING`: filtra grupos DEPOIS do agrupamento
+
+**Resultado Esperado:**
+- **Total de linhas:** 1-5 linhas (apenas categorias com receita > R$ 50.000)
+- **Colunas:** `categoria`, `receita_total`
+- **Filtro:** Apenas categorias onde `receita_total > 50000`
+- **Validação:** 
+  - Todas as linhas devem ter `receita_total` maior que 50.000
+  - Geralmente categorias como "Eletrônicos" e "Informática" aparecem
 
 ---
 
@@ -177,6 +286,19 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 - Segmentações
 - Transformações de dados
 - Flags e indicadores
+
+**Resultado Esperado:**
+- **Total de linhas:** 200 (todos os produtos)
+- **Colunas:** `nome_produto`, `preco_atual`, `faixa_preco`
+- **Classificações:**
+  - `Econômico`: preço < R$ 100
+  - `Médio`: preço entre R$ 100 e R$ 300
+  - `Alto`: preço entre R$ 300 e R$ 600
+  - `Premium`: preço >= R$ 600
+- **Ordenação:** Do mais caro para o mais barato
+- **Validação:** 
+  - Produtos com preço < 100 devem ter `faixa_preco = 'Econômico'`
+  - Produtos com preço >= 600 devem ter `faixa_preco = 'Premium'`
 
 ---
 
@@ -204,6 +326,15 @@ Esta pasta contém **21 exemplos SQL** organizados em progressão didática. **C
 **Limitações:**
 - Pode ser mais lento que JOINs
 - Menos flexível que CTEs
+
+**Resultado Esperado:**
+- **Total de linhas:** ~100-150 produtos (produtos acima da média)
+- **Colunas:** `nome_produto`, `categoria`, `marca`, `preco_atual`
+- **Filtro:** Apenas produtos onde `preco_atual > média geral`
+- **Ordenação:** Do mais caro para o mais barato
+- **Validação:** 
+  - Todos os produtos devem ter preço acima da média geral
+  - A média geral pode ser calculada separadamente para verificar
 
 ---
 
@@ -235,6 +366,16 @@ WITH nome_cte AS (
 SELECT ... FROM nome_cte ...
 ```
 
+**Resultado Esperado:**
+- **Total de linhas:** ~20-30 produtos (produtos acima da média dos concorrentes)
+- **Colunas:** `nome_produto`, `categoria`, `nosso_preco`, `preco_medio_concorrente`, `preco_minimo_concorrente`, `diferenca_media`
+- **Filtro:** Apenas produtos onde nosso preço > média dos concorrentes
+- **Ordenação:** Maior diferença primeiro
+- **Validação:** 
+  - `nosso_preco` deve ser maior que `preco_medio_concorrente`
+  - `diferenca_media` deve ser positiva
+  - Produtos de tênis devem aparecer (têm preço o dobro dos concorrentes)
+
 ---
 
 #### `exemplo-14-right-join.sql`
@@ -260,6 +401,22 @@ SELECT ... FROM nome_cte ...
 - `LEFT JOIN`: todos da esquerda + matches da direita
 - `RIGHT JOIN`: todos da direita + matches da esquerda
 
+**Resultado Esperado:**
+
+**14A - Todas as Vendas:**
+- **Total de linhas:** 30 linhas (LIMIT 30)
+- **Colunas:** `id_venda`, `data_venda`, `id_produto`, `nome_produto`, `categoria`, `quantidade`, `preco_unitario`, `receita_venda`
+- **Validação:** 
+  - Algumas linhas podem ter `nome_produto = NULL` (vendas de produtos não cadastrados)
+  - Vendas ordenadas por data mais recente
+
+**14B - Vendas Não Cadastradas:**
+- **Total de linhas:** ~20 linhas (N_SALES_UNREGISTERED)
+- **Colunas:** `id_produto`, `total_vendas`, `total_quantidade`, `receita_total`, `preco_medio`
+- **Validação:** 
+  - Todos os `id_produto` não devem existir na tabela `produtos`
+  - `total_vendas` deve ser >= 1 para cada produto
+
 ---
 
 #### `exemplo-15-left-join.sql`
@@ -283,6 +440,24 @@ SELECT ... FROM nome_cte ...
 **Exemplos incluídos:**
 - 15A: Todos os produtos com suas vendas (ou NULL)
 - 15B: Produtos que NUNCA foram vendidos (HAVING COUNT = 0)
+
+**Resultado Esperado:**
+
+**15A - Todos os Produtos:**
+- **Total de linhas:** 200 linhas (todos os produtos)
+- **Colunas:** `id_produto`, `nome_produto`, `categoria`, `preco_atual`, `total_vendas`
+- **Ordenação:** Do menor para o maior número de vendas
+- **Validação:** 
+  - Alguns produtos terão `total_vendas = 0` (nunca vendidos)
+  - Produtos de tênis devem ter pouquíssimas ou nenhuma venda
+
+**15B - Produtos Nunca Vendidos:**
+- **Total de linhas:** ~15-30 produtos (incluindo os 15 tênis + alguns outros)
+- **Colunas:** `id_produto`, `nome_produto`, `categoria`, `preco_atual`, `total_vendas`
+- **Filtro:** Apenas produtos com `total_vendas = 0`
+- **Validação:** 
+  - Todos devem ter `total_vendas = 0`
+  - Muitos produtos de tênis devem aparecer aqui
 
 ---
 
@@ -308,6 +483,16 @@ SELECT ... FROM nome_cte ...
 - Decisões de ajuste de preço
 - Negociação com fornecedores
 
+**Resultado Esperado:**
+- **Total de linhas:** ~30 linhas (LIMIT 30)
+- **Colunas:** `id_produto`, `nome_produto`, `categoria`, `marca`, `nosso_preco`, `nome_concorrente`, `preco_concorrente`, `diferenca_absoluta`, `percentual_mais_caro`
+- **Filtro:** Apenas produtos onde nosso preço > preço do concorrente
+- **Ordenação:** Maior percentual de diferença primeiro
+- **Validação:** 
+  - `percentual_mais_caro` deve ser positivo
+  - Produtos de tênis devem aparecer no topo (preço o dobro = 100% mais caro)
+  - `diferenca_absoluta = nosso_preco - preco_concorrente`
+
 ---
 
 #### `exemplo-17-agregacoes-avancadas.sql`
@@ -328,6 +513,17 @@ SELECT ... FROM nome_cte ...
 - Distribuição de receita por canal
 - Participação percentual de categorias
 - Análise de mix de produtos
+
+**Resultado Esperado:**
+- **Total de linhas:** 2 linhas (ecommerce e loja_fisica)
+- **Colunas:** `canal_venda`, `total_vendas`, `receita_total`, `percentual_receita`
+- **Valores esperados:**
+  - `ecommerce`: ~72% da receita
+  - `loja_fisica`: ~28% da receita
+  - `percentual_receita`: Soma deve ser 100% (ou próximo)
+- **Validação:** 
+  - A soma dos percentuais deve ser 100%
+  - `receita_total` do ecommerce deve ser maior que loja_fisica
 
 ---
 
@@ -350,6 +546,18 @@ SELECT ... FROM nome_cte ...
 1. CTE 1: Produtos top vendas (com receita)
 2. CTE 2: Preços de concorrentes (mínimo e médio)
 3. Query final: Combina tudo com classificações
+
+**Resultado Esperado:**
+- **Total de linhas:** ~10-20 produtos (top sellers acima do mercado)
+- **Colunas:** `nome_produto`, `categoria`, `nosso_preco`, `preco_minimo_concorrente`, `preco_medio_concorrente`, `receita_total`, `status_preco`, `percentual_diferenca`
+- **Filtro:** Apenas produtos top sellers onde nosso preço > preço mínimo do concorrente
+- **Classificação:**
+  - `status_preco`: "Acima do mercado" (todos devem ter esse status)
+- **Ordenação:** Maior percentual de diferença primeiro
+- **Validação:** 
+  - Todos devem ter `status_preco = 'Acima do mercado'`
+  - `percentual_diferenca` deve ser positivo
+  - Produtos ordenados por maior diferença percentual
 
 ---
 
@@ -383,6 +591,19 @@ SELECT ... FROM nome_cte ...
 - Query complexa usada várias vezes
 - Simplificar acesso para outros usuários
 - Controlar quais dados são visíveis
+
+**Resultado Esperado:**
+- **Ação:** VIEW criada com sucesso
+- **Para usar a VIEW:**
+  ```sql
+  SELECT * FROM produtos_com_vendas LIMIT 10;
+  ```
+- **Resultado da VIEW:**
+  - **Total de linhas:** 200 (todos os produtos)
+  - **Colunas:** `id_produto`, `nome_produto`, `categoria`, `marca`, `preco_atual`, `total_vendas`, `receita_total`
+  - **Validação:** 
+    - Produtos sem vendas terão `total_vendas = 0` e `receita_total = 0`
+    - Produtos com vendas terão valores > 0
 
 ---
 
@@ -422,6 +643,20 @@ SELECT ... FROM nome_cte ...
 - **VIEW**: não armazena dados, apenas query (mais lento, não ocupa espaço)
 - **TABLE**: armazena dados físicos (mais rápido, ocupa espaço)
 
+**Resultado Esperado:**
+- **Ação:** Tabela criada e dados inseridos
+- **Para consultar a tabela:**
+  ```sql
+  SELECT * FROM resumo_vendas_categoria ORDER BY receita_total DESC;
+  ```
+- **Resultado:**
+  - **Total de linhas:** ~10-11 linhas (uma por categoria)
+  - **Colunas:** `categoria`, `total_vendas`, `receita_total`, `data_atualizacao`
+  - **Validação:** 
+    - Cada categoria aparece uma vez
+    - `data_atualizacao` deve ter a data/hora atual
+    - Valores devem corresponder aos dados de vendas
+
 ---
 
 #### `exemplo-21-criar-temp-view.sql`
@@ -458,6 +693,22 @@ SELECT ... FROM nome_cte ...
 - **VIEW**: permanente, precisa DROP para remover
 - **TEMP VIEW**: temporária, removida automaticamente
 - **TABLE**: permanente, armazena dados físicos
+
+**Resultado Esperado:**
+- **Ação:** TEMP VIEW criada com sucesso
+- **Para usar a TEMP VIEW:**
+  ```sql
+  SELECT * FROM produtos_mais_vendidos_temp LIMIT 20;
+  ```
+- **Resultado:**
+  - **Total de linhas:** ~50-100 produtos (apenas com mais de 10 vendas)
+  - **Colunas:** `id_produto`, `nome_produto`, `categoria`, `total_vendas`, `receita_total`
+  - **Filtro:** Apenas produtos com `total_vendas > 10`
+  - **Ordenação:** Maior receita primeiro
+  - **Validação:** 
+    - Todos devem ter `total_vendas > 10`
+    - Produtos ordenados por receita decrescente
+    - A TEMP VIEW será removida automaticamente ao desconectar
 
 ---
 
