@@ -130,15 +130,20 @@ Uma **tabela** é uma estrutura bidimensional que organiza dados em:
 
 ### 🔄 Fluxo de Trabalho com SQL
 
-O fluxo de trabalho com SQL segue este caminho:
+O fluxo de trabalho com SQL é **bidirecional**: você envia uma consulta e recebe os dados de volta.
 
 ```mermaid
-graph LR
-    A[Desenvolvedor/<br/>Analista] --> B[IDE/<br/>Editor SQL]
-    B --> C[SGBD<br/>Sistema Gerenciador<br/>de Banco de Dados]
-    C --> D[Banco de Dados]
-    D --> E[Tabelas]
-    E --> F[Dados]
+graph TB
+    A[👤 Desenvolvedor/<br/>Analista] -->|1. Escreve Query SQL| B[💻 IDE/<br/>Editor SQL]
+    B -->|2. Envia Query| C[🗄️ SGBD<br/>Sistema Gerenciador<br/>de Banco de Dados]
+    C -->|3. Consulta| D[📊 Banco de Dados]
+    D -->|4. Busca| E[📋 Tabelas]
+    E -->|5. Retorna| F[💾 Dados]
+    F -->|6. Dados| E
+    E -->|7. Dados| D
+    D -->|8. Resultado| C
+    C -->|9. Resultado| B
+    B -->|10. Exibe Resultado| A
     
     style A fill:#4A90E2,color:#fff
     style B fill:#50C878,color:#fff
@@ -148,17 +153,39 @@ graph LR
     style F fill:#1ABC9C,color:#fff
 ```
 
-**Explicação do fluxo:**
+**Explicação do fluxo (ida e volta):**
 
-1. **Desenvolvedor/Analista**: Você escreve a query SQL
-2. **IDE/Editor SQL**: Ferramenta onde você escreve (Supabase SQL Editor, DBeaver, pgAdmin, etc.)
-3. **SGBD (Sistema Gerenciador de Banco de Dados)**: Software que gerencia o banco (PostgreSQL, MySQL, etc.)
-4. **Banco de Dados**: O banco específico (ex: `ecommerce_db`)
-5. **Tabelas**: Estruturas dentro do banco (ex: `produtos`, `vendas`)
-6. **Dados**: Os registros reais armazenados
+**🔄 IDA (Enviando a Query):**
+1. **Desenvolvedor/Analista**: Você escreve a query SQL (ex: `SELECT * FROM produtos`)
+2. **IDE/Editor SQL**: A query é enviada através da ferramenta (Supabase SQL Editor, DBeaver, pgAdmin, etc.)
+3. **SGBD**: O Sistema Gerenciador de Banco de Dados recebe e processa a query
+4. **Banco de Dados**: O SGBD acessa o banco específico (ex: `ecommerce_db`)
+5. **Tabelas**: O banco busca nas tabelas (ex: `produtos`, `vendas`)
+6. **Dados**: Os dados são localizados e preparados
+
+**↩️ VOLTA (Recebendo os Dados):**
+7. **Dados → Tabelas**: Os dados são retornados das tabelas
+8. **Tabelas → Banco**: O banco organiza os resultados
+9. **Banco → SGBD**: O SGBD processa e formata os resultados
+10. **SGBD → IDE**: Os resultados são enviados de volta para o editor
+11. **IDE → Você**: Você visualiza os dados na tela
 
 **No nosso caso:**
-- **Você** → **Supabase SQL Editor** → **PostgreSQL** → **Banco ecommerce** → **Tabelas** → **Dados**
+- **Você** escreve no **Supabase SQL Editor** → **PostgreSQL** consulta → **Dados retornam** → **Você vê o resultado**
+
+**Exemplo prático:**
+```sql
+-- Você escreve isso:
+SELECT nome_produto, preco_atual 
+FROM produtos 
+WHERE categoria = 'Eletrônicos';
+
+-- O fluxo acontece automaticamente:
+-- 1. Query vai → PostgreSQL
+-- 2. PostgreSQL busca → Tabela produtos
+-- 3. Dados voltam → Supabase SQL Editor
+-- 4. Você vê → Resultado na tela
+```
 
 ---
 
@@ -343,6 +370,25 @@ Neste **Dia 1**, vamos focar em:
   ```
 - **Validação:** Verifique se todos os 200 produtos aparecem e se os nomes são produtos brasileiros reais
 
+**Código Completo:**
+
+```1:16:aulas/aula-01-sql/exemplo-01-select-basico.sql
+-- ============================================
+-- EXEMPLO 1: SELECT Básico
+-- ============================================
+-- Conceito: Selecionar colunas de uma tabela
+-- Pergunta: Quais produtos temos no catálogo?
+
+SELECT 
+    id_produto,
+    nome_produto,
+    categoria,
+    marca,
+    preco_atual
+FROM 
+    produtos;
+```
+
 ---
 
 #### `exemplo-02-order-by.sql`
@@ -365,6 +411,26 @@ Neste **Dia 1**, vamos focar em:
 - **Primeira linha:** Produto com maior `preco_atual` (pode variar, mas deve estar acima de R$ 500)
 - **Última linha:** Produto com menor `preco_atual` (geralmente próximo de R$ 29,90)
 - **Validação:** Verifique se os preços estão em ordem decrescente
+
+**Código Completo:**
+
+```1:17:aulas/aula-01-sql/exemplo-02-order-by.sql
+-- ============================================
+-- EXEMPLO 2: ORDER BY
+-- ============================================
+-- Conceito: Ordenar resultados por uma ou mais colunas
+-- Pergunta: Quais são os produtos ordenados por preço (do mais caro para o mais barato)?
+
+SELECT 
+    nome_produto,
+    categoria,
+    marca,
+    preco_atual
+FROM 
+    produtos
+ORDER BY 
+    preco_atual DESC;
+```
 
 ---
 
@@ -389,6 +455,32 @@ Neste **Dia 1**, vamos focar em:
   - Todos devem ter preço acima de R$ 500 (geralmente)
   - Os preços devem estar em ordem decrescente
 
+**Código Completo:**
+
+```1:23:aulas/aula-01-sql/exemplo-03-limit.sql
+-- ============================================
+-- EXEMPLO 3: LIMIT
+-- ============================================
+-- Conceito: Limitar a quantidade de registros retornados
+-- Pergunta: Quais são os 10 primeiros produtos mais caros?
+--
+-- IMPORTANTE:
+-- - LIMIT sempre vem no final da query
+-- - Geralmente usamos LIMIT junto com ORDER BY para pegar os "top N"
+-- - Neste exemplo, combinamos ORDER BY (exemplo 2) com LIMIT
+
+SELECT 
+    nome_produto,
+    categoria,
+    marca,
+    preco_atual
+FROM 
+    produtos
+ORDER BY 
+    preco_atual DESC
+LIMIT 10;
+```
+
 ---
 
 #### `exemplo-04-where.sql`
@@ -411,6 +503,26 @@ Neste **Dia 1**, vamos focar em:
 - **Validação:** 
   - Todas as linhas devem ter `preco_atual` maior que 500
   - Nenhuma linha deve ter `preco_atual` menor ou igual a 500
+
+**Código Completo:**
+
+```1:17:aulas/aula-01-sql/exemplo-04-where.sql
+-- ============================================
+-- EXEMPLO 4: WHERE (Filtros)
+-- ============================================
+-- Conceito: Filtrar registros com condições
+-- Pergunta: Quais produtos custam mais de R$ 500?
+
+SELECT 
+    nome_produto,
+    categoria,
+    marca,
+    preco_atual
+FROM 
+    produtos
+WHERE 
+    preco_atual > 500;
+```
 
 ---
 
@@ -466,6 +578,82 @@ Neste **Dia 1**, vamos focar em:
 - **Colunas:** Todas as métricas combinadas
 - **Validação:** Todos os valores devem fazer sentido (receita > 0, ticket médio razoável)
 
+**Código Completo:**
+
+```1:73:aulas/aula-01-sql/exemplo-05-funcoes-agregacao.sql
+-- ============================================
+-- EXEMPLO 5: Funções de Agregação
+-- ============================================
+-- Conceito: Calcular totais, médias, contagens, máximos e mínimos
+--
+-- FUNÇÕES DE AGREGAÇÃO DISPONÍVEIS:
+-- - COUNT: Conta registros
+-- - SUM: Soma valores
+-- - AVG: Calcula média
+-- - MAX: Encontra o maior valor
+-- - MIN: Encontra o menor valor
+--
+-- IMPORTANTE:
+-- - COUNT(*) conta todas as linhas (inclui NULLs)
+-- - COUNT(coluna) conta apenas valores não-nulos
+-- - COUNT(DISTINCT coluna) conta valores únicos
+
+-- ============================================
+-- EXEMPLO 5A: COUNT, SUM e AVG
+-- ============================================
+-- Pergunta: Qual é o total de vendas, receita total e ticket médio?
+
+SELECT 
+    COUNT(*) AS total_vendas,
+    SUM(quantidade) AS total_unidades_vendidas,
+    SUM(quantidade * preco_unitario) AS receita_total,
+    AVG(quantidade * preco_unitario) AS ticket_medio
+FROM 
+    vendas;
+
+-- ============================================
+-- EXEMPLO 5B: MAX e MIN
+-- ============================================
+-- Pergunta: Qual é a maior e menor venda? Qual o produto mais caro?
+
+SELECT 
+    MAX(quantidade * preco_unitario) AS maior_venda,
+    MIN(quantidade * preco_unitario) AS menor_venda,
+    MAX(preco_unitario) AS maior_preco_unitario,
+    MIN(preco_unitario) AS menor_preco_unitario
+FROM 
+    vendas;
+
+-- ============================================
+-- EXEMPLO 5C: COUNT com DISTINCT
+-- ============================================
+-- Pergunta: Quantos produtos diferentes foram vendidos? Quantos clientes únicos compraram?
+
+SELECT 
+    COUNT(DISTINCT id_produto) AS produtos_diferentes_vendidos,
+    COUNT(DISTINCT id_cliente) AS clientes_unicos,
+    COUNT(*) AS total_vendas
+FROM 
+    vendas;
+
+-- ============================================
+-- EXEMPLO 5D: Todas as funções juntas
+-- ============================================
+-- Pergunta: Resumo completo das vendas
+
+SELECT 
+    COUNT(*) AS total_vendas,
+    COUNT(DISTINCT id_produto) AS produtos_unicos,
+    COUNT(DISTINCT id_cliente) AS clientes_unicos,
+    SUM(quantidade) AS total_unidades,
+    SUM(quantidade * preco_unitario) AS receita_total,
+    AVG(quantidade * preco_unitario) AS ticket_medio,
+    MAX(quantidade * preco_unitario) AS maior_venda,
+    MIN(quantidade * preco_unitario) AS menor_venda
+FROM 
+    vendas;
+```
+
 ---
 
 ### 🔗 Nível 3: Relacionamentos (Exemplos 6, 8, 9)
@@ -504,6 +692,50 @@ Neste **Dia 1**, vamos focar em:
 - **Validação:** 
   - Todas as linhas devem ter `nome_produto` preenchido (não NULL)
   - O `id_produto` deve existir na tabela `produtos`
+
+**Código Completo:**
+
+```1:41:aulas/aula-01-sql/exemplo-06-join.sql
+-- ============================================
+-- EXEMPLO 6: JOIN
+-- ============================================
+-- Conceito: Entender o que é JOIN
+-- Pergunta: Como ver o nome do produto junto com a venda?
+--
+-- ANTES DO JOIN:
+-- - Tabela vendas tem: id_venda, id_produto, quantidade
+-- - Tabela produtos tem: id_produto, nome_produto, categoria
+-- - Não conseguimos ver o nome do produto na venda!
+--
+-- COM O JOIN:
+-- - Juntamos as duas tabelas pelo id_produto
+-- - Agora vemos id_venda E nome_produto juntos!
+--
+-- COMO FUNCIONA:
+-- 1. Pegamos uma linha de vendas
+-- 2. Procuramos o id_produto correspondente em produtos
+-- 3. Combinamos as informações das duas tabelas
+-- 4. Resultado: uma linha com dados de ambas as tabelas
+--
+-- SINTAXE BÁSICA:
+--   FROM tabela1 t1
+--   INNER JOIN tabela2 t2 ON t1.coluna = t2.coluna
+--
+-- IMPORTANTE:
+-- - INNER JOIN só retorna linhas que têm match em ambas as tabelas
+-- - Use aliases (v, p) para encurtar nomes
+-- - Sempre especifique a tabela: v.id_venda, p.nome_produto
+
+SELECT 
+    v.id_venda,
+    v.id_produto,
+    p.nome_produto,
+    v.quantidade
+FROM 
+    vendas v
+    INNER JOIN produtos p ON v.id_produto = p.id_produto
+LIMIT 10;
+```
 
 ---
 
@@ -545,6 +777,75 @@ Neste **Dia 1**, vamos focar em:
   - `receita_total` = soma de todas as vendas da categoria
   - `preco_medio` deve estar dentro da faixa de preços dos produtos
 
+**Código Completo:**
+
+```1:66:aulas/aula-01-sql/exemplo-08-group-by-join.sql
+-- ============================================
+-- EXEMPLO 8: GROUP BY com JOIN
+-- ============================================
+-- Conceito: Agrupar dados de tabelas juntadas
+--
+-- COMO FUNCIONA:
+-- 1. Fazemos JOIN para juntar vendas com produtos
+-- 2. Agrupamos por categoria (GROUP BY)
+-- 3. Calculamos métricas para cada grupo
+--
+-- IMPORTANTE:
+-- - Todas as colunas no SELECT devem estar no GROUP BY ou serem funções de agregação
+-- - GROUP BY sempre vem depois do JOIN e antes do ORDER BY
+
+-- ============================================
+-- EXEMPLO 8A: Primeiro passo - Categoria e Total de Vendas
+-- ============================================
+-- Pergunta: Quantas vendas foram feitas por categoria?
+
+SELECT 
+    p.categoria,
+    COUNT(*) AS total_vendas
+FROM 
+    vendas v
+    INNER JOIN produtos p ON v.id_produto = p.id_produto
+GROUP BY 
+    p.categoria
+ORDER BY 
+    total_vendas DESC;
+
+-- ============================================
+-- EXEMPLO 8B: Adicionando Receita Total
+-- ============================================
+-- Pergunta: Qual é a receita total por categoria?
+
+SELECT 
+    p.categoria,
+    COUNT(*) AS total_vendas,
+    SUM(v.quantidade * v.preco_unitario) AS receita_total
+FROM 
+    vendas v
+    INNER JOIN produtos p ON v.id_produto = p.id_produto
+GROUP BY 
+    p.categoria
+ORDER BY 
+    receita_total DESC;
+
+-- ============================================
+-- EXEMPLO 8C: Análise Completa por Categoria
+-- ============================================
+-- Pergunta: Qual é a receita total, preço médio e total de vendas por categoria?
+
+SELECT 
+    p.categoria,
+    COUNT(*) AS total_vendas,
+    SUM(v.quantidade * v.preco_unitario) AS receita_total,
+    AVG(v.preco_unitario) AS preco_medio
+FROM 
+    vendas v
+    INNER JOIN produtos p ON v.id_produto = p.id_produto
+GROUP BY 
+    p.categoria
+ORDER BY 
+    receita_total DESC;
+```
+
 ---
 
 #### `exemplo-09-having-join.sql`
@@ -571,6 +872,30 @@ Neste **Dia 1**, vamos focar em:
 - **Validação:** 
   - Todas as linhas devem ter `receita_total` maior que 50.000
   - Geralmente categorias como "Eletrônicos" e "Informática" aparecem
+
+**Código Completo:**
+
+```1:21:aulas/aula-01-sql/exemplo-09-having-join.sql
+-- ============================================
+-- EXEMPLO 9: HAVING com JOIN
+-- ============================================
+-- Conceito: Filtrar resultados após agrupamento
+-- Pergunta: Quais categorias geram mais de R$ 50.000 em receita?
+
+SELECT 
+    p.categoria,
+    COUNT(*) AS total_vendas,
+    SUM(v.quantidade * v.preco_unitario) AS receita_total
+FROM 
+    vendas v
+    INNER JOIN produtos p ON v.id_produto = p.id_produto
+GROUP BY 
+    p.categoria
+HAVING 
+    SUM(v.quantidade * v.preco_unitario) > 50000
+ORDER BY 
+    receita_total DESC;
+```
 
 ---
 
@@ -609,6 +934,30 @@ Neste **Dia 1**, vamos focar em:
   - Produtos com preço < 100 devem ter `faixa_preco = 'Econômico'`
   - Produtos com preço >= 600 devem ter `faixa_preco = 'Premium'`
 
+**Código Completo:**
+
+```1:21:aulas/aula-01-sql/exemplo-07-case-when.sql
+-- ============================================
+-- EXEMPLO 7: CASE WHEN (Lógica Condicional)
+-- ============================================
+-- Conceito: Criar classificações e categorizações
+-- Pergunta: Classifique os produtos por faixa de preço
+
+SELECT 
+    nome_produto,
+    preco_atual,
+    CASE 
+        WHEN preco_atual < 100 THEN 'Econômico'
+        WHEN preco_atual < 300 THEN 'Médio'
+        WHEN preco_atual < 600 THEN 'Alto'
+        ELSE 'Premium'
+    END AS faixa_preco
+FROM 
+    produtos
+ORDER BY 
+    preco_atual DESC;
+```
+
 ---
 
 ### 🚀 Nível 5: Queries Avançadas (Exemplos 12-15)
@@ -644,6 +993,31 @@ Neste **Dia 1**, vamos focar em:
 - **Validação:** 
   - Todos os produtos devem ter preço acima da média geral
   - A média geral pode ser calculada separadamente para verificar
+
+**Código Completo:**
+
+```1:22:aulas/aula-01-sql/exemplo-12-subquery.sql
+-- ============================================
+-- EXEMPLO 12: Subquery (Query Dentro de Query)
+-- ============================================
+-- Conceito: Usar resultado de uma query dentro de outra
+-- Pergunta: Quais produtos têm preço acima da média geral?
+
+SELECT 
+    nome_produto,
+    categoria,
+    marca,
+    preco_atual
+FROM 
+    produtos
+WHERE 
+    preco_atual > (
+        SELECT AVG(preco_atual) 
+        FROM produtos
+    )
+ORDER BY 
+    preco_atual DESC;
+```
 
 ---
 
@@ -685,6 +1059,42 @@ SELECT ... FROM nome_cte ...
   - `diferenca_media` deve ser positiva
   - Produtos de tênis devem aparecer (têm preço o dobro dos concorrentes)
 
+**Código Completo:**
+
+```1:33:aulas/aula-01-sql/exemplo-13-cte-with.sql
+-- ============================================
+-- EXEMPLO 13: CTE (WITH) - Common Table Expressions
+-- ============================================
+-- Conceito: Organizar queries complexas em partes
+-- Pergunta: Quais produtos estão mais caros que a média dos concorrentes?
+
+WITH preco_medio_concorrente AS (
+    SELECT 
+        id_produto,
+        AVG(preco_concorrente) AS preco_medio_concorrente,
+        MIN(preco_concorrente) AS preco_minimo_concorrente
+    FROM 
+        preco_competidores
+    GROUP BY 
+        id_produto
+)
+SELECT 
+    p.nome_produto,
+    p.categoria,
+    p.preco_atual AS nosso_preco,
+    pmc.preco_medio_concorrente,
+    pmc.preco_minimo_concorrente,
+    (p.preco_atual - pmc.preco_medio_concorrente) AS diferenca_media
+FROM 
+    produtos p
+    INNER JOIN preco_medio_concorrente pmc ON p.id_produto = pmc.id_produto
+WHERE 
+    p.preco_atual > pmc.preco_medio_concorrente
+ORDER BY 
+    diferenca_media DESC
+LIMIT 20;
+```
+
 ---
 
 #### `exemplo-14-right-join.sql`
@@ -725,6 +1135,70 @@ SELECT ... FROM nome_cte ...
 - **Validação:** 
   - Todos os `id_produto` não devem existir na tabela `produtos`
   - `total_vendas` deve ser >= 1 para cada produto
+
+**Código Completo:**
+
+```1:61:aulas/aula-01-sql/exemplo-14-right-join.sql
+-- ============================================
+-- EXEMPLO 14: RIGHT JOIN
+-- ============================================
+-- Conceito: Incluir todos os registros da tabela da direita, mesmo sem match
+--
+-- COMO FUNCIONA:
+-- - RIGHT JOIN retorna TODOS os registros da tabela da direita (vendas)
+-- - Adiciona dados da tabela da esquerda (produtos) quando há correspondência
+-- - Se não houver match, os valores da esquerda são NULL
+--
+-- DIFERENÇA DO INNER JOIN:
+-- - INNER JOIN: só retorna vendas de produtos cadastrados
+-- - RIGHT JOIN: retorna TODAS as vendas, mesmo de produtos não cadastrados
+--
+-- CASO DE NEGÓCIO:
+-- Identificar vendas de produtos que não estão cadastrados no catálogo
+-- Isso indica problemas de integridade de dados ou produtos descontinuados
+
+-- ============================================
+-- EXEMPLO 14A: Ver todas as vendas com dados do produto (ou NULL)
+-- ============================================
+-- Pergunta: Quais vendas temos e de quais produtos (incluindo não cadastrados)?
+
+SELECT 
+    v.id_venda,
+    v.data_venda,
+    v.id_produto,
+    p.nome_produto,
+    p.categoria,
+    v.quantidade,
+    v.preco_unitario,
+    (v.quantidade * v.preco_unitario) AS receita_venda
+FROM 
+    produtos p
+    RIGHT JOIN vendas v ON p.id_produto = v.id_produto
+ORDER BY 
+    v.data_venda DESC
+LIMIT 30;
+
+-- ============================================
+-- EXEMPLO 14B: Vendas de produtos NÃO cadastrados
+-- ============================================
+-- Pergunta: Quais vendas foram feitas de produtos que não estão no catálogo?
+
+SELECT 
+    v.id_produto,
+    COUNT(v.id_venda) AS total_vendas,
+    SUM(v.quantidade) AS total_quantidade,
+    SUM(v.quantidade * v.preco_unitario) AS receita_total,
+    AVG(v.preco_unitario) AS preco_medio
+FROM 
+    produtos p
+    RIGHT JOIN vendas v ON p.id_produto = v.id_produto
+WHERE 
+    p.id_produto IS NULL
+GROUP BY 
+    v.id_produto
+ORDER BY 
+    receita_total DESC;
+```
 
 ---
 
@@ -768,6 +1242,68 @@ SELECT ... FROM nome_cte ...
   - Todos devem ter `total_vendas = 0`
   - Muitos produtos de tênis devem aparecer aqui
 
+**Código Completo:**
+
+```1:59:aulas/aula-01-sql/exemplo-15-left-join.sql
+-- ============================================
+-- EXEMPLO 15: LEFT JOIN
+-- ============================================
+-- Conceito: Incluir todos os registros da tabela da esquerda, mesmo sem match
+--
+-- COMO FUNCIONA:
+-- - LEFT JOIN retorna TODOS os registros da tabela da esquerda (produtos)
+-- - Adiciona dados da tabela da direita (vendas) quando há correspondência
+-- - Se não houver match, os valores da direita são NULL
+--
+-- DIFERENÇA DO INNER JOIN:
+-- - INNER JOIN: só retorna produtos que têm vendas
+-- - LEFT JOIN: retorna TODOS os produtos, mesmo sem vendas
+--
+-- CASO DE NEGÓCIO:
+-- Identificar produtos cadastrados que nunca geraram venda
+-- Isso ajuda a identificar itens que precisam de atenção em marketing
+
+-- ============================================
+-- EXEMPLO 15A: Ver todos os produtos com suas vendas (ou NULL)
+-- ============================================
+-- Pergunta: Quais produtos temos e quantas vendas cada um teve?
+
+SELECT 
+    p.id_produto,
+    p.nome_produto,
+    p.categoria,
+    p.preco_atual,
+    COUNT(v.id_venda) AS total_vendas
+FROM 
+    produtos p
+    LEFT JOIN vendas v ON p.id_produto = v.id_produto
+GROUP BY 
+    p.id_produto, p.nome_produto, p.categoria, p.preco_atual
+ORDER BY 
+    total_vendas ASC, p.preco_atual DESC;
+
+-- ============================================
+-- EXEMPLO 15B: Produtos que NUNCA foram vendidos
+-- ============================================
+-- Pergunta: Quais produtos nunca foram vendidos?
+
+SELECT 
+    p.id_produto,
+    p.nome_produto,
+    p.categoria,
+    p.preco_atual,
+    COUNT(v.id_venda) AS total_vendas
+FROM 
+    produtos p
+    LEFT JOIN vendas v ON p.id_produto = v.id_produto
+GROUP BY 
+    p.id_produto, p.nome_produto, p.categoria, p.preco_atual
+HAVING 
+    COUNT(v.id_venda) = 0
+ORDER BY 
+    p.preco_atual DESC;
+```
+
 ---
 
 ### 💰 Nível 6: Análises de Negócio (Exemplos 16-18)
@@ -802,6 +1338,48 @@ SELECT ... FROM nome_cte ...
   - Produtos de tênis devem aparecer no topo (preço o dobro = 100% mais caro)
   - `diferenca_absoluta = nosso_preco - preco_concorrente`
 
+**Código Completo:**
+
+```1:39:aulas/aula-01-sql/exemplo-16-produtos-mais-baratos-concorrente.sql
+-- ============================================
+-- EXEMPLO 16: Comparação de Preços com Concorrentes
+-- ============================================
+-- Conceito: Comparar nossos preços com os preços dos concorrentes
+-- Pergunta: Quais produtos estão mais baratos no concorrente do que na nossa tabela?
+--
+-- NESTE EXEMPLO VOCÊ APRENDE:
+-- - Como comparar preços entre tabelas diferentes
+-- - Como usar JOIN para combinar produtos com preços de concorrentes
+-- - Como calcular a diferença percentual entre preços
+-- - Como identificar oportunidades de ajuste de preço
+--
+-- CASO DE NEGÓCIO:
+-- Identificar produtos onde os concorrentes estão mais baratos
+-- Isso ajuda a tomar decisões sobre ajuste de preços ou negociação com fornecedores
+
+SELECT 
+    p.id_produto,
+    p.nome_produto,
+    p.categoria,
+    p.marca,
+    p.preco_atual AS nosso_preco,
+    pc.nome_concorrente,
+    pc.preco_concorrente,
+    (p.preco_atual - pc.preco_concorrente) AS diferenca_absoluta,
+    ROUND(
+        ((p.preco_atual - pc.preco_concorrente) / pc.preco_concorrente * 100), 
+        2
+    ) AS percentual_mais_caro
+FROM 
+    produtos p
+    INNER JOIN preco_competidores pc ON p.id_produto = pc.id_produto
+WHERE 
+    p.preco_atual > pc.preco_concorrente
+ORDER BY 
+    percentual_mais_caro DESC
+LIMIT 30;
+```
+
 ---
 
 #### `exemplo-17-agregacoes-avancadas.sql`
@@ -833,6 +1411,34 @@ SELECT ... FROM nome_cte ...
 - **Validação:** 
   - A soma dos percentuais deve ser 100%
   - `receita_total` do ecommerce deve ser maior que loja_fisica
+
+**Código Completo:**
+
+```1:25:aulas/aula-01-sql/exemplo-17-agregacoes-avancadas.sql
+-- ============================================
+-- EXEMPLO 17: Agregações Avançadas (ROUND, Percentuais)
+-- ============================================
+-- Conceito: Calcular percentuais e formatar números
+-- Pergunta: Qual é a distribuição percentual de receita por canal?
+
+SELECT 
+    canal_venda,
+    COUNT(*) AS total_vendas,
+    SUM(quantidade * preco_unitario) AS receita_total,
+    ROUND(
+        SUM(quantidade * preco_unitario) * 100.0 / (
+            SELECT SUM(quantidade * preco_unitario) 
+            FROM vendas
+        ), 
+        2
+    ) AS percentual_receita
+FROM 
+    vendas
+GROUP BY 
+    canal_venda
+ORDER BY 
+    receita_total DESC;
+```
 
 ---
 
@@ -867,6 +1473,65 @@ SELECT ... FROM nome_cte ...
   - Todos devem ter `status_preco = 'Acima do mercado'`
   - `percentual_diferenca` deve ser positivo
   - Produtos ordenados por maior diferença percentual
+
+**Código Completo:**
+
+```1:56:aulas/aula-01-sql/exemplo-18-query-completa.sql
+-- ============================================
+-- EXEMPLO 18: Query Completa (Todos os Conceitos)
+-- ============================================
+-- Conceito: Combinar múltiplos conceitos em uma análise complexa
+-- Pergunta: Quais produtos top sellers estão mais caros que todos os concorrentes?
+
+WITH produtos_top_vendas AS (
+    SELECT 
+        p.id_produto,
+        p.nome_produto,
+        p.categoria,
+        p.preco_atual,
+        SUM(v.quantidade * v.preco_unitario) AS receita_total
+    FROM 
+        produtos p
+        INNER JOIN vendas v ON p.id_produto = v.id_produto
+    GROUP BY 
+        p.id_produto, p.nome_produto, p.categoria, p.preco_atual
+    ORDER BY 
+        receita_total DESC
+    LIMIT 30
+),
+precos_concorrentes AS (
+    SELECT 
+        id_produto,
+        MIN(preco_concorrente) AS preco_minimo_concorrente,
+        AVG(preco_concorrente) AS preco_medio_concorrente
+    FROM 
+        preco_competidores
+    GROUP BY 
+        id_produto
+)
+SELECT 
+    ptv.nome_produto,
+    ptv.categoria,
+    ptv.preco_atual AS nosso_preco,
+    pc.preco_minimo_concorrente,
+    pc.preco_medio_concorrente,
+    ptv.receita_total,
+    CASE 
+        WHEN ptv.preco_atual > pc.preco_minimo_concorrente THEN 'Acima do mercado'
+        ELSE 'Competitivo'
+    END AS status_preco,
+    ROUND(
+        ((ptv.preco_atual - pc.preco_minimo_concorrente) / pc.preco_minimo_concorrente * 100), 
+        2
+    ) AS percentual_diferenca
+FROM 
+    produtos_top_vendas ptv
+    INNER JOIN precos_concorrentes pc ON ptv.id_produto = pc.id_produto
+WHERE 
+    ptv.preco_atual > pc.preco_minimo_concorrente
+ORDER BY 
+    percentual_diferenca DESC;
+```
 
 ---
 
@@ -913,6 +1578,61 @@ SELECT ... FROM nome_cte ...
   - **Validação:** 
     - Produtos sem vendas terão `total_vendas = 0` e `receita_total = 0`
     - Produtos com vendas terão valores > 0
+
+**Código Completo:**
+
+```1:52:aulas/aula-01-sql/exemplo-19-criar-view.sql
+-- ============================================
+-- EXEMPLO 19: Criar VIEW (Visão)
+-- ============================================
+-- Conceito: Criar uma visão (view) que armazena uma query como se fosse uma tabela
+-- Pergunta: Como criar uma visão para produtos com vendas?
+--
+-- O QUE É UMA VIEW?
+-- - Uma VIEW é uma query armazenada que se comporta como uma tabela
+-- - Você pode fazer SELECT em uma VIEW como se fosse uma tabela normal
+-- - A VIEW não armazena dados, ela executa a query toda vez que é consultada
+--
+-- VANTAGENS:
+-- - Simplifica queries complexas (escreva uma vez, use várias vezes)
+-- - Facilita manutenção (mude a VIEW, todos que usam são atualizados)
+-- - Controla acesso a dados (usuários veem apenas o que a VIEW permite)
+-- - Abstrai complexidade (usuários não precisam saber JOINs complexos)
+--
+-- QUANDO USAR:
+-- - Quando você tem uma query complexa que é usada várias vezes
+-- - Quando quer simplificar o acesso a dados para outros usuários
+-- - Quando precisa controlar quais dados os usuários podem ver
+--
+-- DIFERENÇA DE TABELA:
+-- - TABELA: armazena dados físicos no disco
+-- - VIEW: não armazena dados, apenas a definição da query
+
+-- Criar a VIEW
+CREATE VIEW produtos_com_vendas AS
+SELECT 
+    p.id_produto,
+    p.nome_produto,
+    p.categoria,
+    p.marca,
+    p.preco_atual,
+    COUNT(v.id_venda) AS total_vendas,
+    SUM(v.quantidade * v.preco_unitario) AS receita_total
+FROM 
+    produtos p
+    LEFT JOIN vendas v ON p.id_produto = v.id_produto
+GROUP BY 
+    p.id_produto, p.nome_produto, p.categoria, p.marca, p.preco_atual;
+
+-- Agora você pode usar a VIEW como se fosse uma tabela:
+-- SELECT * FROM produtos_com_vendas WHERE total_vendas > 10;
+
+-- Para ver a VIEW criada:
+-- SELECT * FROM produtos_com_vendas LIMIT 10;
+
+-- Para remover a VIEW (se necessário):
+-- DROP VIEW produtos_com_vendas;
+```
 
 ---
 
@@ -966,6 +1686,69 @@ SELECT ... FROM nome_cte ...
     - `data_atualizacao` deve ter a data/hora atual
     - Valores devem corresponder aos dados de vendas
 
+**Código Completo:**
+
+```1:60:aulas/aula-01-sql/exemplo-20-criar-tabela.sql
+-- ============================================
+-- EXEMPLO 20: Criar TABELA
+-- ============================================
+-- Conceito: Criar uma tabela física para armazenar dados
+-- Pergunta: Como criar uma tabela para armazenar resumo de vendas por categoria?
+--
+-- O QUE É UMA TABELA?
+-- - Uma TABELA é uma estrutura física que armazena dados no banco
+-- - Os dados são persistidos no disco e permanecem mesmo após desconectar
+-- - Você pode inserir, atualizar, deletar e consultar dados em uma tabela
+--
+-- VANTAGENS:
+-- - Dados são armazenados fisicamente (mais rápido para consultas frequentes)
+-- - Pode ser indexada para melhor performance
+-- - Pode ter constraints (validações, chaves primárias, etc.)
+-- - Dados persistem mesmo após reiniciar o banco
+--
+-- QUANDO USAR:
+-- - Quando precisa armazenar dados que serão consultados muitas vezes
+-- - Quando quer melhorar performance de queries complexas
+-- - Quando precisa de dados históricos ou agregados
+-- - Quando quer garantir integridade com constraints
+--
+-- DIFERENÇA DE VIEW:
+-- - TABELA: armazena dados físicos (mais rápido, ocupa espaço)
+-- - VIEW: não armazena dados, apenas a query (mais lento, não ocupa espaço)
+
+-- Criar a tabela
+CREATE TABLE resumo_vendas_categoria (
+    categoria TEXT NOT NULL,
+    total_vendas INTEGER NOT NULL,
+    receita_total REAL NOT NULL,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (categoria)
+);
+
+-- Inserir dados na tabela usando uma query
+INSERT INTO resumo_vendas_categoria (categoria, total_vendas, receita_total)
+SELECT 
+    p.categoria,
+    COUNT(v.id_venda) AS total_vendas,
+    SUM(v.quantidade * v.preco_unitario) AS receita_total
+FROM 
+    produtos p
+    LEFT JOIN vendas v ON p.id_produto = v.id_produto
+GROUP BY 
+    p.categoria;
+
+-- Consultar a tabela criada
+-- SELECT * FROM resumo_vendas_categoria ORDER BY receita_total DESC;
+
+-- Para atualizar dados na tabela:
+-- UPDATE resumo_vendas_categoria 
+-- SET total_vendas = 100, receita_total = 50000.00 
+-- WHERE categoria = 'Eletrônicos';
+
+-- Para remover a tabela (se necessário):
+-- DROP TABLE resumo_vendas_categoria;
+```
+
 ---
 
 #### `exemplo-21-criar-temp-view.sql`
@@ -1018,6 +1801,67 @@ SELECT ... FROM nome_cte ...
     - Todos devem ter `total_vendas > 10`
     - Produtos ordenados por receita decrescente
     - A TEMP VIEW será removida automaticamente ao desconectar
+
+**Código Completo:**
+
+```1:58:aulas/aula-01-sql/exemplo-21-criar-temp-view.sql
+-- ============================================
+-- EXEMPLO 21: Criar TEMP VIEW (Visão Temporária)
+-- ============================================
+-- Conceito: Criar uma visão temporária que existe apenas durante a sessão
+-- Pergunta: Como criar uma visão temporária para análise rápida?
+--
+-- O QUE É UMA TEMP VIEW?
+-- - Uma TEMP VIEW é uma view que existe apenas durante a sessão atual
+-- - Ela é automaticamente removida quando você desconecta do banco
+-- - Útil para análises temporárias ou testes
+--
+-- VANTAGENS:
+-- - Não polui o banco de dados (é removida automaticamente)
+-- - Útil para testes e análises exploratórias
+-- - Não precisa se preocupar em limpar depois
+-- - Cada sessão pode ter sua própria TEMP VIEW com o mesmo nome
+--
+-- QUANDO USAR:
+-- - Para análises temporárias durante uma sessão
+-- - Para testes de queries antes de criar uma VIEW permanente
+-- - Quando você não quer deixar "lixo" no banco
+-- - Para análises exploratórias que não serão reutilizadas
+--
+-- DIFERENÇA DE VIEW E TABELA:
+-- - VIEW: permanente, precisa DROP VIEW para remover
+-- - TEMP VIEW: temporária, removida automaticamente ao desconectar
+-- - TABELA: permanente, armazena dados físicos
+
+-- Criar a TEMP VIEW
+CREATE TEMP VIEW produtos_mais_vendidos_temp AS
+SELECT 
+    p.id_produto,
+    p.nome_produto,
+    p.categoria,
+    COUNT(v.id_venda) AS total_vendas,
+    SUM(v.quantidade * v.preco_unitario) AS receita_total
+FROM 
+    produtos p
+    INNER JOIN vendas v ON p.id_produto = v.id_produto
+GROUP BY 
+    p.id_produto, p.nome_produto, p.categoria
+HAVING 
+    COUNT(v.id_venda) > 10
+ORDER BY 
+    receita_total DESC;
+
+-- Usar a TEMP VIEW como uma tabela normal
+-- SELECT * FROM produtos_mais_vendidos_temp LIMIT 20;
+
+-- A TEMP VIEW será automaticamente removida quando você:
+-- - Desconectar do banco de dados
+-- - Fechar a sessão
+-- - Executar: DROP VIEW produtos_mais_vendidos_temp;
+
+-- Para remover manualmente (opcional):
+-- DROP VIEW produtos_mais_vendidos_temp;
+```
 
 ---
 
