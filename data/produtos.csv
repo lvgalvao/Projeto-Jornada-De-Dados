@@ -1,0 +1,216 @@
+id_produto,nome_produto,categoria,marca,preco_atual,data_criacao
+prd_2293732b7542,Cortina Blackout,Casa,Xiaomi,68.90,2022-12-13 17:49:51
+prd_84a009f1889d,Cortina Box,Casa,Consul,32.90,2022-08-19 17:49:51
+prd_ff35b88df534,SSD 500GB,Eletrônicos,Acer,211.90,2023-06-28 17:49:51
+prd_38c1b898aecc,Microfone para Stream,Games,Samsung,140.90,2024-06-12 17:49:51
+prd_4ee65ed59110,Frigideira Antiaderente,Cozinha,Philips,41.90,2024-01-29 17:49:51
+prd_dfac11815029,Microfone para Stream,Games,Apple,189.00,2023-11-19 17:49:51
+prd_334f4a32f979,Persiana Vertical,Casa,Motorola,404.50,2022-10-08 17:49:51
+prd_b7490508211e,Vestido Floral,Moda,Apple,220.00,2024-09-13 17:49:51
+prd_23664e42a71c,Jogo de Toalhas,Casa,Xiaomi,109.90,2024-01-06 17:49:51
+prd_045813f96891,Cardigan de Lã,Moda,LG,142.99,2025-02-02 17:49:51
+prd_6d4e3b1efd0c,Necessaire,Acessórios,Xiaomi,1139.99,2022-03-02 17:49:51
+prd_afd58e5fd09d,Condicionador Hidratante,Beleza,Asus,451.90,2025-08-20 17:49:51
+prd_686e2aab873d,Blusa de Frio,Moda,Philips,89.50,2022-05-27 17:49:51
+prd_a4025bac91a7,Óculos de Sol,Acessórios,Xiaomi,52.90,2022-09-23 17:49:51
+prd_bf5d8671f7a9,Placa Mãe B450,Informática,Brastemp,119.90,2023-03-29 17:49:51
+prd_205f309c1a21,Tapete Persa,Casa,Sony,34.99,2022-08-30 17:49:51
+prd_92c0ecf60a58,Jogo de Toalhas,Casa,Brastemp,180.90,2022-11-26 17:49:51
+prd_385035a5bc20,Notebook Inspiron 15,Eletrônicos,Adidas,219.90,2024-05-11 17:49:51
+prd_9239eec8982d,HD Externo 2TB,Informática,Arno,51.99,2023-03-14 17:49:51
+prd_8b22fd85d500,Garrafa Térmica 1L,Cozinha,Sony,324.99,2022-08-04 17:49:51
+prd_d500fa66507e,Shorts Jeans,Moda,Electrolux,384.99,2023-01-12 17:49:51
+prd_d92ad43fa137,Smart TV 43 Polegadas,Eletrônicos,Philips,66.90,2024-04-13 17:49:51
+prd_645f7859f379,Calça Jeans Skinny,Moda,Asus,486.90,2023-04-13 17:49:51
+prd_82cd17cb589d,Persiana Vertical,Casa,Dell,44.90,2024-07-09 17:49:51
+prd_f063f46a7ef8,Fone de Ouvido Esportivo,Áudio,Consul,1428.99,2022-02-20 17:49:51
+prd_d22d1b8b1502,Camisa Social,Moda,Brastemp,1149.90,2023-02-08 17:49:51
+prd_30518d908a92,Cinto de Couro,Acessórios,Asus,80.99,2024-09-18 17:49:51
+prd_c62100cc281c,Webcam para Stream,Games,Samsung,48.90,2025-10-30 17:49:51
+prd_2cbafff50c72,Sabonete Facial,Beleza,Nike,100.90,2025-04-07 17:49:51
+prd_51511e44c92a,Kit Gamer Completo,Games,Mondial,88.90,2025-06-23 17:49:51
+prd_a479149bae3b,Edredom Casal,Casa,Electrolux,87.99,2022-03-25 17:49:51
+prd_56e08463d21c,Tapete Persa,Casa,Brastemp,223.90,2024-12-06 17:49:51
+prd_9b6e92e0766c,Casaco de Inverno,Moda,Arno,35.90,2025-08-01 17:49:51
+prd_9f5272275347,Marcador de Texto,Acessórios,Sony,59.50,2025-06-25 17:49:51
+prd_31b74a170d35,Saia Midi,Moda,Consul,72.90,2025-09-04 17:49:51
+prd_6b1b9c7303d5,Peneira Inox,Cozinha,Samsung,765.99,2023-06-16 17:49:51
+prd_55776d3e5c2a,Garrafa Esportiva,Esporte,Adidas,183.90,2024-10-14 17:49:51
+prd_8fa1119d3982,Roteador Wi-Fi 6,Eletrônicos,Adidas,39.90,2023-05-02 17:49:51
+prd_3bee9877eb80,Rádio AM/FM,Áudio,Lenovo,45.50,2025-08-15 17:49:51
+prd_206eacaa3048,Joystick Arcade,Games,Asus,116.99,2022-10-05 17:49:51
+prd_7af81d9a08ba,Controle PlayStation,Games,O Boticário,49.99,2024-03-26 17:49:51
+prd_a3ae425a3edd,Pesos de Pulso,Esporte,Philips,83.99,2024-04-28 17:49:51
+prd_951e09f3ecb1,Chaveiro Personalizado,Acessórios,LG,48.99,2025-06-12 17:49:51
+prd_08fc82e8b75d,Persiana Vertical,Casa,Acer,137.90,2025-08-15 17:49:51
+prd_f1f39e56f84d,Bermuda Tactel,Moda,Motorola,54.99,2022-07-30 17:49:51
+prd_1649b8a625e4,Fone de Ouvido Bluetooth,Áudio,Adidas,99.00,2025-04-02 17:49:51
+prd_fd4be5bad76d,Colchonete Yoga,Esporte,Sony,140.90,2024-10-28 17:49:51
+prd_6343e70ed4b9,Sérum Vitamina C,Beleza,Xiaomi,152.00,2025-09-20 17:49:51
+prd_ebdebaf4cd37,Edredom Casal,Casa,Xiaomi,39.90,2024-07-15 17:49:51
+prd_c1f6dcbed826,Descascador de Legumes,Cozinha,Adidas,192.90,2022-02-17 17:49:51
+prd_9aa451566556,Jarra de Vidro,Cozinha,Apple,395.90,2025-04-16 17:49:51
+prd_3053916502fb,Cabo USB-C,Eletrônicos,Electrolux,448.50,2024-01-01 17:49:51
+prd_9adbaa3083e1,Jaqueta Jeans,Moda,Sony,93.50,2022-07-11 17:49:51
+prd_40dc70ce05b2,Assadeira de Vidro,Cozinha,Lenovo,1310.50,2025-11-13 17:49:51
+prd_7798c88cc490,Kit Utensílios de Cozinha,Cozinha,Consul,465.50,2024-07-05 17:49:51
+prd_651e8d1acbf8,Processador de Alimentos,Cozinha,Brastemp,464.90,2023-06-05 17:49:51
+prd_65c60230d4ed,Base Líquida,Beleza,Asus,99.90,2024-06-11 17:49:51
+prd_eda682ecfacb,Organizador de Gaveta,Casa,Electrolux,171.00,2022-12-31 17:49:51
+prd_1b8a6057bb97,Shampoo Anticaspa,Beleza,Sony,315.99,2024-07-08 17:49:51
+prd_22f73233f9a5,Notebook Inspiron 15,Eletrônicos,O Boticário,103.90,2022-08-10 17:49:51
+prd_7dd7624b4d5f,Fone de Ouvido com Fio,Áudio,Brastemp,297.90,2023-07-24 17:49:51
+prd_02dd786968a0,HD Externo 1TB,Eletrônicos,Adidas,242.99,2024-11-25 17:49:51
+prd_db8fc9e6fa53,Paleta de Sombras,Beleza,LG,1420.99,2022-04-15 17:49:51
+prd_dd8079e89b90,Porta-retrato,Casa,Nike,84.90,2024-05-07 17:49:51
+prd_e561d57f2a21,Caixa de Som 2.1,Áudio,Acer,116.99,2025-01-11 17:49:51
+prd_473cb7923d3d,Kit Gamer Completo,Games,Motorola,109.90,2024-10-29 17:49:51
+prd_f8e027f417be,Placa Mãe B450,Informática,O Boticário,180.90,2024-10-22 17:49:51
+prd_ea6b930ce9ac,Gravador de Voz,Áudio,Lenovo,156.99,2022-07-14 17:49:51
+prd_abc44b46bee1,Sabonete Facial,Beleza,Asus,149.90,2025-11-13 17:49:51
+prd_f79cf82f8ee0,Caixa de Som JBL,Eletrônicos,Mondial,219.90,2022-06-23 17:49:51
+prd_fce914504522,Headset Gamer 7.1,Games,Brastemp,74.99,2025-12-22 17:49:51
+prd_96fbc500aec1,Edredom Casal,Casa,Asus,58.90,2025-09-22 17:49:51
+prd_0b790b565ff2,Mixer de Áudio,Áudio,Sony,107.99,2022-11-15 17:49:51
+prd_a4ee2d52d1c5,Suporte para Controle,Games,Arno,213.90,2022-12-07 17:49:51
+prd_9a3dfc23b7a3,Relógio Analógico,Acessórios,Mondial,105.50,2024-06-14 17:49:51
+prd_a17c779dd289,Gravador de Voz,Áudio,Asus,64.90,2024-06-25 17:49:51
+prd_d0368e440753,Batom Matte,Beleza,Adidas,34.90,2025-02-24 17:49:51
+prd_fb32df842fbd,Vestido Floral,Moda,Consul,92.90,2024-11-05 17:49:51
+prd_7a89c1a36f9e,Mesa para Notebook,Informática,Puma,519.50,2022-10-11 17:49:51
+prd_18c839427e8c,Gabinete ATX,Informática,Samsung,798.90,2023-08-28 17:49:51
+prd_d8ec0b81e223,Toca-discos USB,Áudio,O Boticário,371.90,2023-04-14 17:49:51
+prd_c50822dc2e7c,Teclado Mecânico RGB,Eletrônicos,Philips,223.99,2023-05-21 17:49:51
+prd_6742b65088d8,Porta-temperos,Cozinha,Adidas,41.99,2025-11-08 17:49:51
+prd_0c5fb549e1c2,Edredom Casal,Casa,Dell,295.90,2024-03-03 17:49:51
+prd_5a6fd66e1c00,Vestido Casual,Moda,Philips,112.90,2023-08-23 17:49:51
+prd_c708b046fef8,Halteres Ajustáveis,Esporte,Mondial,46.00,2024-01-17 17:49:51
+prd_0c113961481f,Vestido Floral,Moda,Apple,243.90,2025-11-22 17:49:51
+prd_2bf8388221ea,Mouse Gamer RGB,Games,Asus,49.99,2024-10-13 17:49:51
+prd_eea07161e6c8,Brincos de Prata,Acessórios,Electrolux,48.99,2025-05-13 17:49:51
+prd_9259039bf9b2,Tábua de Corte,Cozinha,Sony,240.99,2023-11-26 17:49:51
+prd_5437b387f602,Webcam 1080p,Informática,LG,227.90,2022-02-05 17:49:51
+prd_e3934c71bd0c,Meia Esportiva,Esporte,Sony,391.90,2023-01-07 17:49:51
+prd_1974423eecee,Suporte para Monitor,Informática,LG,164.50,2023-04-05 17:49:51
+prd_6eca734f2e84,Edredom Casal,Casa,Electrolux,227.99,2023-07-26 17:49:51
+prd_b17460641fb4,Garrafa Térmica 1L,Cozinha,Xiaomi,239.99,2023-05-26 17:49:51
+prd_6ae727ee4463,Placa Mãe B450,Informática,Xiaomi,74.00,2024-06-10 17:49:51
+prd_c29b93111bd9,Colar de Ouro,Acessórios,Arno,206.90,2023-03-27 17:49:51
+prd_e580cb77e94a,Máscara Facial,Beleza,Mondial,107.90,2022-08-31 17:49:51
+prd_6212ac3178f2,Óculos de Natação,Esporte,Samsung,144.90,2023-09-23 17:49:51
+prd_b09d96e599b3,Marcador de Texto,Acessórios,Asus,203.90,2025-11-28 17:49:51
+prd_11a9489c4c86,Porta-retrato,Casa,Asus,74.99,2023-12-09 17:49:51
+prd_2255432fabe7,Marcador de Texto,Acessórios,Nike,119.99,2024-01-13 17:49:51
+prd_474405dcce41,Brincos de Prata,Acessórios,Motorola,67.90,2025-05-03 17:49:51
+prd_47a25ae10c23,Soundbar TV,Áudio,Acer,88.99,2023-01-24 17:49:51
+prd_622325b011e6,Iluminador para Stream,Games,Sony,323.90,2024-04-23 17:49:51
+prd_359246d9ed10,SSD 500GB,Eletrônicos,Dell,118.99,2022-02-04 17:49:51
+prd_84fc6c2a33f2,Abre-latas,Cozinha,Sony,393.90,2023-07-15 17:49:51
+prd_1e4ccab8af1a,Máscara Facial,Beleza,Apple,111.90,2025-08-22 17:49:51
+prd_3e585d1aaf6c,Gabinete ATX,Informática,LG,209.90,2022-11-07 17:49:51
+prd_3dd1d39581ca,Halteres Ajustáveis,Esporte,Asus,52.99,2022-07-16 17:49:51
+prd_815b38747487,Conjunto de Malha,Moda,Brastemp,86.50,2023-08-08 17:49:51
+prd_d51f590876b9,Boné Esportivo,Esporte,O Boticário,58.90,2024-11-03 17:49:51
+prd_b4a98acf1a5f,Cardigan de Lã,Moda,LG,35.90,2025-12-28 17:49:51
+prd_1f81bf3405b1,Fonte PC 500W,Informática,O Boticário,61.90,2024-06-02 17:49:51
+prd_9b4e39e312d9,Carteira de Couro,Acessórios,Asus,1287.99,2022-04-19 17:49:51
+prd_e772a9cda46d,Blusa de Algodão,Moda,LG,36.90,2024-07-07 17:49:51
+prd_6f0a4eefed22,Faqueiro Inox 12 Peças,Cozinha,Apple,39.99,2022-10-25 17:49:51
+prd_bf94f6ee7033,Mochila Esportiva,Esporte,Sony,78.90,2024-06-24 17:49:51
+prd_c9b4024b7b9e,Toca-discos USB,Áudio,Mondial,95.50,2024-03-13 17:49:51
+prd_5ae195cb554b,Microfone para Stream,Games,Samsung,58.50,2022-10-12 17:49:51
+prd_032c166122f7,Controle Xbox,Games,Xiaomi,219.90,2023-02-05 17:49:51
+prd_305f920b8836,Brincos de Prata,Acessórios,Lenovo,935.50,2025-06-30 17:49:51
+prd_289cf61bbd5e,Porta-moedas,Acessórios,Consul,100.50,2024-02-27 17:49:51
+prd_a7c360e156c0,Gabinete ATX,Informática,Motorola,171.99,2025-10-19 17:49:51
+prd_052f1c397fc6,Carteira de Couro,Acessórios,Philips,66.99,2023-02-14 17:49:51
+prd_e55f1f3ae9ad,SSD 500GB,Eletrônicos,Arno,71.90,2023-03-19 17:49:51
+prd_3e42ffcc8dd9,Mochila Escolar,Acessórios,Acer,67.90,2022-02-02 17:49:51
+prd_ae7b2acb6812,Cinto de Couro,Acessórios,Samsung,1108.90,2025-02-12 17:49:51
+prd_84c0492c5dd9,Óculos de Natação,Esporte,Samsung,132.00,2025-05-15 17:49:51
+prd_faf3fd1a4155,Cinto de Couro,Acessórios,Dell,102.90,2024-06-22 17:49:51
+prd_694bd92302c1,Gabinete ATX,Informática,Mondial,92.90,2022-08-24 17:49:51
+prd_6185cee255bc,Caixa de Som 2.1,Áudio,LG,107.90,2023-02-28 17:49:51
+prd_2befc441dd56,Bicicleta Ergométrica,Esporte,Motorola,228.99,2022-04-22 17:49:51
+prd_3fb63c4ea3c2,Óculos de Sol,Acessórios,Arno,164.99,2022-12-17 17:49:51
+prd_40902505f7f1,Fonte PC 500W,Informática,Philips,495.90,2023-11-10 17:49:51
+prd_b2fdb7f36a3f,Blusa de Algodão,Moda,LG,52.99,2023-11-14 17:49:51
+prd_0347eab01a6c,Memória RAM 8GB,Informática,Mondial,626.00,2024-02-23 17:49:51
+prd_89d76b194110,Travesseiro Ortopédico,Casa,Sony,179.99,2023-09-16 17:49:51
+prd_07ff67746d02,Faqueiro Inox 12 Peças,Cozinha,Mondial,316.99,2023-10-11 17:49:51
+prd_90725b7ac0e8,Espelho de Parede,Casa,Adidas,78.99,2023-04-09 17:49:51
+prd_11bf1703f8e9,Caixa de Som Portátil,Áudio,O Boticário,48.00,2024-09-24 17:49:51
+prd_1091c2cfe1e9,Edredom Casal,Casa,Sony,425.90,2025-01-27 17:49:51
+prd_727f175116c6,Bicicleta Ergométrica,Esporte,Apple,63.90,2023-08-04 17:49:51
+prd_06c19781c3db,Assadeira de Vidro,Cozinha,Nike,100.90,2025-01-09 17:49:51
+prd_2365af16d827,Tela Mosquiteira,Casa,Brastemp,151.00,2025-03-15 17:49:51
+prd_142839b15f63,Vestido Casual,Moda,Xiaomi,99.50,2023-05-26 17:49:51
+prd_76ede0cece8f,Óculos de Natação,Esporte,Lenovo,58.00,2024-04-30 17:49:51
+prd_6442b103f637,Adaptador HDMI-VGA,Informática,Arno,299.90,2023-04-19 17:49:51
+prd_e66747c9b59e,Cesto de Vime,Casa,Brastemp,194.00,2024-05-08 17:49:51
+prd_35a61bfe666d,Teclado Mecânico RGB,Eletrônicos,Xiaomi,55.99,2025-09-24 17:49:51
+prd_d21486ad974a,Teclado Gamer RGB,Games,Motorola,307.50,2024-10-11 17:49:51
+prd_ff56c9132964,Regata Básica,Moda,Xiaomi,213.99,2025-03-28 17:49:51
+prd_64000b956cf3,Tapete Persa,Casa,Motorola,258.90,2025-04-08 17:49:51
+prd_380fab5d7131,Porta-retrato,Casa,Philips,142.90,2022-12-25 17:49:51
+prd_b76e68fde5cb,Perfume 100ml,Beleza,Nike,457.90,2023-04-22 17:49:51
+prd_d205de276c20,Raquete de Tênis,Esporte,Sony,64.99,2024-09-27 17:49:51
+prd_c9ce9d378723,Processador Intel i5,Informática,Electrolux,41.90,2025-04-24 17:49:51
+prd_28cd8ab86936,Porta-moedas,Acessórios,Xiaomi,226.00,2025-05-26 17:49:51
+prd_f7ed5522d23e,Macacão Feminino,Moda,Samsung,242.90,2022-08-02 17:49:51
+prd_92c4758afec3,Vestido Floral,Moda,Arno,325.90,2025-03-22 17:49:51
+prd_cc3053305ba7,iPhone 14,Eletrônicos,Motorola,616.90,2022-12-29 17:49:51
+prd_93ed035b2e9e,Peneira Inox,Cozinha,Arno,116.99,2022-12-23 17:49:51
+prd_5112469132ff,Placa Mãe B450,Informática,Dell,413.50,2022-07-22 17:49:51
+prd_3805ad8d3d2c,Adaptador HDMI-VGA,Informática,Apple,148.90,2024-09-06 17:49:51
+prd_ef0b5e05efef,Creme Hidratante,Beleza,Electrolux,247.90,2023-10-10 17:49:51
+prd_9d1aea4d28ae,Pesos de Pulso,Esporte,Sony,1324.90,2024-10-25 17:49:51
+prd_295160cbf171,Controle Xbox,Games,Apple,310.90,2022-11-03 17:49:51
+prd_0aba258682b7,Vestido Floral,Moda,Adidas,72.50,2024-03-01 17:49:51
+prd_803bcbb7ef84,Porta-temperos,Cozinha,Samsung,118.00,2022-12-23 17:49:51
+prd_996db03524ae,Elástico de Resistência,Esporte,Sony,123.90,2024-09-02 17:49:51
+prd_ab011325c1be,Suporte para Controle,Games,Samsung,31.99,2023-01-21 17:49:51
+prd_223c9b6a0a76,Luminária de Mesa,Casa,Mondial,81.99,2023-06-22 17:49:51
+prd_899bd21840eb,Mixer de Áudio,Áudio,O Boticário,53.50,2023-01-31 17:49:51
+prd_4e1abbd002eb,Mochila Esportiva,Esporte,Samsung,44.90,2022-02-27 17:49:51
+prd_3308eb4d2b62,Cobertor de Lã,Casa,Arno,32.99,2025-08-21 17:49:51
+prd_9d7b9035daa0,Forma de Bolo Redonda,Cozinha,O Boticário,191.90,2022-08-28 17:49:51
+prd_ebb0865fc95d,Fone Gamer RGB,Áudio,Arno,175.99,2025-05-13 17:49:51
+prd_b4a823952be5,Amplificador de Áudio,Áudio,Consul,73.90,2023-06-19 17:49:51
+prd_4a5427b33a63,Mouse Pad Gamer,Informática,Sony,78.90,2025-02-24 17:49:51
+prd_f6a0a3346af9,Carteira de Couro,Acessórios,LG,273.90,2023-12-01 17:49:51
+prd_5744e3f88341,Jarra de Vidro,Cozinha,Apple,192.90,2025-04-27 17:49:51
+prd_728d12065bf5,Suporte para Monitor,Informática,Consul,430.00,2022-08-22 17:49:51
+prd_c90040774892,Tênis de Corrida,Esporte,Sony,147.99,2024-09-30 17:49:51
+prd_08611917c0ae,Relógio de Parede,Casa,Adidas,105.99,2023-08-08 17:49:51
+prd_df1e44c528e0,Fone de Ouvido Esportivo,Áudio,O Boticário,192.99,2022-04-26 17:49:51
+prd_face62224c50,Tênis Adidas Stan Smith,Tênis,Puma,38.99,2024-02-07 17:49:51
+prd_4219bde6f03a,Tênis Nike Air Max,Tênis,Adidas,68.99,2025-08-13 17:49:51
+prd_fcd221b5cb48,Tênis Puma Future,Tênis,Nike,123.99,2024-10-19 17:49:51
+prd_39484d5e0b36,Tênis Nike Revolution,Tênis,Adidas,69.90,2024-03-09 17:49:51
+prd_da5c2c38df2e,Tênis Nike Court,Tênis,Puma,31.90,2022-07-17 17:49:51
+prd_f325ffd3f299,Tênis Adidas Samba,Tênis,Nike,43.90,2022-08-08 17:49:51
+prd_4327485950d4,Tênis Nike Revolution,Tênis,Adidas,105.90,2023-08-06 17:49:51
+prd_d5b7bdafd562,Tênis Adidas Stan Smith,Tênis,Nike,197.90,2024-04-11 17:49:51
+prd_c4c05e57d1ff,Tênis Nike Dunk,Tênis,Nike,95.90,2024-04-25 17:49:51
+prd_1757e5a44e02,Tênis Nike Blazer,Tênis,Nike,37.90,2025-12-18 17:49:51
+prd_f4d216bbeb27,Tênis Puma Future,Tênis,Adidas,67.90,2024-09-18 17:49:51
+prd_1317c4a1f775,Tênis Puma Speedcat,Tênis,Puma,451.90,2025-10-08 17:49:51
+prd_c632a36ece80,Tênis Nike Air Max,Tênis,Adidas,64.90,2023-08-07 17:49:51
+prd_d17f09896254,Tênis Nike Revolution,Tênis,Puma,174.90,2025-11-21 17:49:51
+prd_225ae25e0a4f,Tênis Puma Suede,Tênis,Adidas,404.50,2023-12-23 17:49:51
+prd_f77140ad51ec,Edredom Casal,Casa,Sony,95.90,2023-10-15 17:49:51
+prd_52514818b0b6,Raquete de Tênis,Esporte,Asus,69.90,2025-05-14 17:49:51
+prd_533e5e22d86e,Rádio AM/FM,Áudio,Acer,337.99,2022-05-22 17:49:51
+prd_bc0258300d50,Assadeira de Vidro,Cozinha,Sony,35.99,2022-05-01 17:49:51
+prd_c11c85a4804c,Quadro Decorativo,Casa,Mondial,93.99,2022-03-10 17:49:51
+prd_3cf08e85ad27,Suporte para Controle,Games,Philips,31.90,2024-04-22 17:49:51
+prd_854644557483,Boné Esportivo,Esporte,Apple,64.90,2025-10-17 17:49:51
+prd_6747a9118767,Mouse Gamer Logitech,Eletrônicos,Motorola,55.50,2022-07-23 17:49:51
+prd_f35f1b6d73bf,Fone Gamer Wireless,Games,Brastemp,93.99,2025-10-10 17:49:51
+prd_0c6ab223bfd4,Post-it,Acessórios,Acer,88.90,2025-08-29 17:49:51
+prd_fd706b862db2,Cinto de Couro,Acessórios,Philips,584.99,2025-10-14 17:49:51
+prd_2cc016f9687b,Vestido Casual,Moda,Arno,199.90,2024-06-02 17:49:51
+prd_9120195f0253,Mouse Pad Gamer,Informática,Philips,126.99,2024-02-17 17:49:51
+prd_00f202452062,Espelho de Parede,Casa,Sony,170.90,2022-04-29 17:49:51
+prd_5da705f2fce5,Mouse Gamer RGB,Games,Philips,49.00,2024-04-07 17:49:51

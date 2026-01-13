@@ -44,13 +44,18 @@ Uma empresa de e-commerce está abrindo sua operação digital e precisa usar da
 ### 🐍 Dia 2: Python & Ingestão de Dados
 **Objetivo:** Dados não nascem prontos
 
-- Dados vêm de sistemas diferentes
-- Formatos diferentes
-- Regras diferentes
+- Ler dados de CSVs e combinar múltiplos arquivos
+- Consumir APIs REST para buscar dados externos
+- Fazer web scraping para coletar dados de sites
+- Conectar com bancos de dados (SQLite, PostgreSQL)
+- Tratar e limpar dados inconsistentes
+- Exportar dados para diferentes formatos
 
-**Entrega do dia:** Um dataset unificado e confiável.
+**O que você aprende:** A pensar como engenheiro de dados usando Python para integrar diferentes fontes de dados.
 
-**Material:** [Aula 2 - Python & Ingestão](./aulas/aula-02-python/) *(em breve)*
+**Entrega do dia:** Scripts Python que coletam, tratam e exportam dados de múltiplas fontes.
+
+**Material:** [Aula 2 - Python & Ingestão](./aulas/aula-02-python/)
 
 ---
 
