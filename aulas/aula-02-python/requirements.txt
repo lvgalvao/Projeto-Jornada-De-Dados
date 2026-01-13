@@ -23,3 +23,9 @@ pyarrow>=12.0.0
 # Utilitários
 python-dotenv>=1.0.0  # Para variáveis de ambiente
 
+# Processamento de imagens
+pillow>=10.0.0  # PIL - Python Imaging Library
+
+# IA para análise de imagens (opcional)
+openai>=1.0.0  # OpenAI API para análise de imagens
+

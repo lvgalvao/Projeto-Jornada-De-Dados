@@ -233,21 +233,37 @@ dados = requests.get("https://api.coinbase.com/v2/prices/spot").json()
 
 Este **Dia 2** foi criado para resolver problemas reais de ingestão de dados. Abaixo estão todas as perguntas que vamos responder com os exemplos:
 
-### 🔥 Aquecimento (Fundamentos)
+### 🔥 Exemplo 00: Aquecimento Python
+1. **Por que preciso saber Python básico para trabalhar com dados?**
+   - Variáveis, listas, dicionários - fundamentos essenciais
+   - Como estruturas de dados se relacionam com dados reais
+   - Por que isso é a base para trabalhar com APIs e arquivos
 
-1. **Por que preciso saber Python básico para trabalhar com dados?** *(Exemplo 00)*
-2. **O que é uma API e como processar dados JSON?** *(Exemplo 00b)*
-3. **Por que usar Pandas ao invés de listas/dicionários?** *(Exemplo 00c)*
+### 💾 Exemplo 01: Conectar com DataLake
+2. **Como ler dados de um Data Lake usando a API S3?**
+   - O que é um Data Lake e por que é importante
+   - Como usar boto3 para conectar com S3/Supabase Storage
+   - Como ler arquivos Parquet de Data Lakes
+   - Por que AWS S3 é o padrão da indústria
 
-### 📂 Ingestão de Dados (Exemplos 1-7)
+### 🗄️ Exemplo 02: Salvar no Banco de Dados
+3. **Como salvar dados processados em um banco PostgreSQL?**
+   - Como conectar Python com PostgreSQL usando SQLAlchemy
+   - Como salvar DataFrame em tabela SQL
+   - Por que pandas serve para ler, processar E salvar dados
 
-4. **Como carregar dados de CSVs em Python?** *(Exemplo 1)*
-5. **Como combinar dados de múltiplos arquivos?** *(Exemplo 2)*
-6. **Como buscar dados de uma API REST?** *(Exemplo 3)*
-7. **Como ler arquivos de fontes externas (GitHub, S3, Data Lakes)?** *(Exemplo 4)*
-8. **Como ler dados diretamente de um banco de dados?** *(Exemplo 5)*
-9. **Como limpar e tratar dados inconsistentes?** *(Exemplo 6)*
-10. **Como exportar dados processados para diferentes formatos?** *(Exemplo 7)*
+### 🎯 Exemplo 03: Projeto Completo
+4. **Como fazer um pipeline completo: DataLake → Banco?**
+   - Como combinar todos os conceitos aprendidos
+   - Pipeline completo: ler do DataLake e salvar no banco
+   - Fluxo EL (Extract, Load) sem processamento
+
+### 🌐 Exemplo 04: Ler API Bitcoin
+5. **Como obter dados de uma API e salvar no banco de dados?**
+   - O que é uma API e por que usar
+   - Como usar a biblioteca requests
+   - Como fazer requisições GET para APIs REST
+   - Pipeline completo: API → Processamento → Banco
 
 ---
 
@@ -255,156 +271,79 @@ Este **Dia 2** foi criado para resolver problemas reais de ingestão de dados. A
 
 Antes de trabalhar com dados, é essencial dominar os fundamentos de Python. Este bloco garante que você tenha a base necessária.
 
-#### `exemplo-00-aquecimento-fundamentos.py`
 **Conceito:** Fundamentos de Python  
 **Pergunta de Negócio:** Por que preciso saber Python básico para trabalhar com dados?  
+
 **O que você aprende:**
 - Print e Hello World
-- Variáveis e tipos básicos (str, int, float)
+- Variáveis e tipos básicos (str, int)
 - Estruturas de dados (lista, dicionário)
-- Métodos úteis
 - Por que isso é importante para trabalhar com dados
+- Como estruturas de dados se relacionam com dados reais (exemplo: tênis)
 
 **Conceitos Python:**
 - `print()`: exibir informações
-- Variáveis: `str`, `int`, `float`
-- Listas: `[]` - coleção ordenada
-- Dicionários: `{}` - pares chave-valor
-- Métodos: funções dos objetos (`.upper()`, `.strip()`, etc.)
+- Variáveis: `str`, `int`
+- Listas: `[]` - coleção ordenada de itens
+- Dicionários: `{}` - pares chave-valor (estrutura mais comum para dados tabulares)
+- Lista de dicionários: estrutura ideal para dados estruturados
 
 **Por que é importante?**
 - APIs retornam dados em JSON (que são dicionários em Python)
 - Arquivos externos precisam ser baixados e processados
-- Dados de CSVs são lidos como strings e precisam conversão
 - Pandas usa esses conceitos por baixo dos panos
+- Dicionários são a base para trabalhar com dados estruturados
+
+**Resultado Esperado:**
+- Compreensão dos fundamentos de Python
+- Capacidade de trabalhar com listas e dicionários
+- Entendimento de como estruturas de dados se relacionam com dados reais
 
 ---
 
-#### `exemplo-00c-introducao-pandas.py`
-**Conceito:** Introdução ao Pandas  
-**Pergunta de Negócio:** Por que Pandas é a biblioteca mais usada para dados em Python?  
-**O que você aprende:**
-- O que é Pandas
-- Por que usar Pandas ao invés de listas/dicionários
-- Conceitos básicos: Series e DataFrame
-- Operações básicas com Pandas
-- Por que Pandas é essencial para trabalhar com dados
+### 💾 Exemplo 01: Conectar com DataLake
 
-**Conceitos Python:**
-- `pd.Series`: uma coluna de dados
-- `pd.DataFrame`: tabela de dados
-- Operações: filtros, agregações, cálculos
-- `df.groupby()`: agrupar dados
-- `df.describe()`: estatísticas descritivas
-
-**Vantagens do Pandas:**
-- Operações diretas (sem loops)
-- Código limpo e legível
-- Otimizado para performance
-- Funcionalidades prontas (filtros, agregações, joins)
-- Integração com Excel, SQL, APIs
+#### `exemplo-01-ler-datalake-parquet.py`
 
 ---
 
 ## 🎯 Progressão de Aprendizado
 
-A aula está dividida em **4 blocos de 20 minutos cada**, totalizando 80 minutos de aprendizado prático:
+A aula está organizada em **5 exemplos práticos** que cobrem todo o fluxo de ingestão de dados:
 
-1. **🔥 Aquecimento Python (20min)** - Fundamentos essenciais
-2. **💾 Conectar com DataLake (20min)** - Trabalhar com armazenamento em nuvem
-3. **🗄️ Salvar no Banco de Dados (20min)** - Persistir dados processados
-4. **🌐 Conectar com uma API (20min)** - Integrar dados externos
-
----
-
-### 🔥 Bloco 1: Aquecimento Python (20min)
-
-Antes de trabalhar com dados, é essencial dominar os fundamentos de Python. Este bloco garante que você tenha a base necessária.
+1. **🔥 Exemplo 00: Aquecimento Python** - Fundamentos essenciais
+2. **💾 Exemplo 01: Conectar com DataLake** - Trabalhar com armazenamento em nuvem
+3. **🗄️ Exemplo 02: Salvar no Banco de Dados** - Persistir dados processados
+4. **🎯 Exemplo 03: Projeto Completo** - Pipeline DataLake → Banco
+5. **🌐 Exemplo 04: Ler API Bitcoin** - Integrar dados externos via API
 
 ---
 
-### 💾 Bloco 2: Conectar com DataLake (20min)
+## 📚 Detalhamento dos Exemplos
 
-Data Lakes são repositórios centralizados para armazenar grandes volumes de dados. Aprenda a conectar e ler dados de Data Lakes usando a API S3 (padrão da indústria).
+### 🔥 Exemplo 00: Aquecimento Python
 
-#### `exemplo-00b-api-json.py`
-**Conceito:** Fundamentos de APIs e JSON  
-**Pergunta de Negócio:** O que é uma API e como processar dados JSON em Python?  
-**O que você aprende:**
-- O que é uma API (Application Programming Interface)
-- O que é JSON e como funciona
-- Como JSON se relaciona com dicionários Python
-- Como processar dados de APIs
-- Por que isso é essencial para ingestão de dados
-
-**Conceitos Python:**
-- `json.loads()`: converte JSON string para dicionário Python
-- `json.dumps()`: converte dicionário Python para JSON string
-- Acessar dados aninhados: `dados["chave"]["subchave"]`
-- Processar listas de dicionários
-
-**Por que APIs são importantes?**
-- Python na engenharia de dados = COMUNICAR com sistemas externos
-- SQL trabalha com dados que JÁ EXISTEM no banco
-- Python BUSCA dados de sistemas externos via APIs
-- Permite integrar dados de múltiplas fontes
-
-**Casos de uso:**
-- Consumir APIs REST
-- Processar respostas de APIs
-- Converter entre formatos
-- Trabalhar com dados estruturados
-
-**Resultado Esperado:**
-- Compreensão do que é API e JSON
-- Capacidade de processar dados JSON em Python
-- Entendimento de como APIs funcionam
-
----
-
-#### `exemplo-03-ler-api-rest.py`
-**Conceito:** Consumir APIs REST na prática  
-**Pergunta de Negócio:** Como obter dados de uma API externa em Python?  
-**O que você aprende:**
-- Como fazer requisições HTTP com requests
-- Como consumir APIs REST
-- Como tratar respostas JSON
-- Como trabalhar com diferentes tipos de dados (JSON, imagens)
-- Exemplos práticos: Bitcoin e NASA
-
-**Conceitos Python:**
-- `requests.get()`: faz requisição HTTP GET
-- `response.json()`: converte resposta para dicionário Python
-- `response.raise_for_status()`: verifica erros HTTP
-- Tratamento de exceções com try/except
-
-**Exemplos práticos:**
-- **API Bitcoin (Coinbase)**: preços de criptomoedas em tempo real
-- **API NASA**: imagens e dados espaciais
-
-**Resultado Esperado:**
-- Dados obtidos de API Bitcoin com sucesso
-- Dados obtidos de API NASA com sucesso
-- Respostas JSON convertidas para DataFrame
-- Tratamento de erros implementado
-
----
-
-#### `exemplo-04-ler-arquivos-externos.py`
-**Conceito:** Conectar com DataLake (S3/Supabase Storage)  
+#### `exemplo-00-aquecimento-fundamentos.py`
+**Conceito:** Conectar com DataLake (S3/Supabase Storage) e ler Parquet  
 **Pergunta de Negócio:** Como ler dados de um Data Lake usando a API S3?  
+
 **O que você aprende:**
-- O que é um Data Lake e por que é importante
-- Como usar boto3 para conectar com S3/Supabase Storage
-- Como ler arquivos CSV e Parquet de Data Lakes
+- Como instalar e importar boto3
+- Como criar um cliente S3 para conectar com DataLake
+- Como listar arquivos no bucket
+- Como baixar arquivos Parquet de Data Lakes
+- Como converter Parquet para DataFrame
+- Análises básicas com Pandas (head, info, describe, groupby, etc.)
 - Por que AWS S3 é o padrão da indústria (mais de 50% das empresas usam)
-- Como trabalhar com armazenamento em nuvem
+- Por que Parquet é ideal para Data Lakes
 
 **Conceitos Python:**
+- `import boto3`: biblioteca para trabalhar com S3
 - `boto3.client()`: cria cliente S3 (compatível com Supabase Storage)
+- `s3.list_objects()`: lista arquivos no bucket
 - `s3.get_object()`: baixa arquivo do Data Lake
-- `pd.read_csv(io.BytesIO())`: lê CSV da memória
 - `pd.read_parquet(io.BytesIO())`: lê Parquet da memória
+- Métodos Pandas: `head()`, `info()`, `describe()`, `value_counts()`, `groupby()`, `nlargest()`, etc.
 
 **Por que Data Lakes são importantes?**
 - Armazenam grandes volumes de dados (terabytes/petabytes)
@@ -420,91 +359,91 @@ Data Lakes são repositórios centralizados para armazenar grandes volumes de da
 
 **Resultado Esperado:**
 - Conexão estabelecida com Data Lake
-- Arquivo CSV baixado e carregado com sucesso
-- Dados analisados (concorrentes, estatísticas de preços)
+- Arquivo Parquet baixado e carregado com sucesso
+- Dados convertidos para DataFrame e analisados com Pandas
 - Compreensão da importância de Data Lakes na indústria
 
 ---
 
-### 🗄️ Bloco 3: Salvar no Banco de Dados (20min)
+### 🗄️ Exemplo 02: Salvar no Banco de Dados
 
-Após processar dados, é essencial salvá-los em um banco de dados para consultas e análises. Aprenda a conectar Python com bancos SQL e persistir dados processados.
+#### `exemplo-02-salvar-banco-dados.py`
+**Conceito:** Salvar dados processados no PostgreSQL usando pandas  
+**Pergunta de Negócio:** Como salvar dados processados em um banco PostgreSQL?  
 
-#### `exemplo-05-ler-banco-dados.py`
-**Conceito:** Conectar Python com bancos de dados SQL  
-**Pergunta de Negócio:** Como ler dados diretamente de um banco SQL em Python?  
 **O que você aprende:**
-- Como conectar Python com SQLite
-- Como conectar Python com PostgreSQL
+- Como conectar com PostgreSQL usando SQLAlchemy
+- Como salvar DataFrame em tabela SQL com `df.to_sql()`
+- Como ler dados salvos para verificar
 - Como executar queries SQL e trazer para pandas
-- Como trabalhar com diferentes tipos de banco
+- Como atualizar tabela existente (append)
+- Por que pandas serve para ler, processar E salvar dados
 
 **Conceitos Python:**
-- `sqlite3.connect()`: conecta com SQLite
-- `pd.read_sql_query()`: executa SQL e retorna DataFrame
 - `sqlalchemy.create_engine()`: cria engine para PostgreSQL
 - `df.to_sql()`: salva DataFrame em tabela SQL
+- `pd.read_sql_query()`: executa SQL e retorna DataFrame
+- `if_exists`: 'replace' (substitui), 'append' (adiciona), 'fail' (erro)
 
-**Vantagens:**
-- Dados sempre atualizados (não precisa exportar CSV)
-- Queries complexas diretamente no banco
-- Performance melhor para grandes volumes
-- Integração nativa com SQL
+**Por que salvar no banco?**
+- Dados podem ser consultados com SQL
+- Integração com outras ferramentas (BI, dashboards)
+- Dados persistentes e seguros
+- Permite queries complexas
 
 **Resultado Esperado:**
-- Conexão com banco estabelecida
-- Queries SQL executadas com sucesso
-- Dados retornados como DataFrame
+- Dados salvos no PostgreSQL com sucesso
+- Tabela criada e populada
+- Dados verificados através de query SQL
+- Compreensão de como Python integra com bancos de dados
 
 ---
 
-#### `exemplo-07-exportar-dados.py`
-**Conceito:** Salvar dados processados no banco de dados  
-**Pergunta de Negócio:** Como salvar dados processados em um banco SQL?  
+### 🎯 Exemplo 03: Projeto Completo
+
+#### `exemplo-03-projeto-completo.py`
+**Conceito:** Buscar dados de API e salvar no PostgreSQL  
+**Pergunta de Negócio:** Como obter dados de uma API e salvar no banco de dados?  
 **O que você aprende:**
-- Como exportar DataFrame para banco de dados SQL
-- Como usar `df.to_sql()` para persistir dados
-- Como escolher o formato adequado (CSV, JSON, Excel, SQL)
-- Como trabalhar com diferentes tipos de banco
+- O que é uma API e por que usar
+- Como usar a biblioteca requests
+- Como fazer requisições GET para APIs REST
+- Como processar dados JSON
+- Como salvar dados de API no PostgreSQL
+- Pipeline completo: API → Processamento → Banco
 
 **Conceitos Python:**
-- `df.to_sql()`: exporta DataFrame para tabela SQL
-- `df.to_csv()`: exporta para CSV
-- `df.to_json()`: exporta para JSON
-- `df.to_excel()`: exporta para Excel
-- `df.to_parquet()`: exporta para Parquet (otimizado)
+- `requests.get()`: faz requisição HTTP GET para API
+- `response.json()`: converte resposta JSON para dicionário Python
+- `response.raise_for_status()`: verifica erros HTTP
+- `pd.DataFrame()`: cria DataFrame a partir de dicionário
+- `df.to_sql()`: salva DataFrame no PostgreSQL
 
-**Quando usar cada formato:**
-- **SQL**: Dados que precisam ser consultados frequentemente
-- **CSV**: Universal, fácil de abrir em Excel
-- **JSON**: Ideal para APIs e integrações
-- **Excel**: Bom para relatórios e apresentações
-- **Parquet**: Otimizado para big data, compressão eficiente
+**O que é uma API?**
+- API (Application Programming Interface) = Interface de Programação de Aplicações
+- Forma de COMUNICAR com outros sistemas através da internet
+- Python na Engenharia de Dados = COMUNICAR com sistemas externos
+- SQL trabalha com dados que JÁ EXISTEM no banco
+- Python BUSCA dados de sistemas externos via APIs
+
+**Biblioteca Requests:**
+- A forma mais simples de fazer requisições HTTP em Python
+- Permite: GET (buscar), POST (enviar), PUT (atualizar), DELETE (deletar)
+- Para engenharia de dados, usamos principalmente GET para buscar dados
+
+**Fluxo Completo:**
+1. **Extract**: Buscar dados da API do Bitcoin (Coinbase)
+2. **Transform**: Processar dados JSON e enriquecer (adicionar timestamp, calcular BRL)
+3. **Load**: Salvar dados processados no PostgreSQL
 
 **Resultado Esperado:**
-- Dados exportados para banco de dados com sucesso
-- Dados prontos para consultas SQL
-- Formato escolhido baseado no uso
+- Dados obtidos da API do Bitcoin com sucesso
+- Dados processados e transformados
+- Dados salvos na tabela `cotacao_bitcoin` no PostgreSQL
+- Pipeline API → Banco funcionando
 
 ---
 
-### 🌐 Bloco 4: Conectar com uma API (20min)
-
-APIs são a forma padrão de comunicação entre sistemas. Aprenda a consumir APIs REST e processar dados JSON em Python.
-
----
-
-## 📚 Exemplos Adicionais (Opcionais)
-
-Estes exemplos complementam o aprendizado e podem ser explorados após os 4 blocos principais:
-
-### `exemplo-01-ler-csv.py` e `exemplo-02-ler-multiplos-csv.py`
-**Conceito:** Trabalhar com arquivos CSV locais  
-**Quando usar:** Quando você tem arquivos CSV no seu computador e precisa carregá-los.
-
-### `exemplo-06-tratar-dados.py`
-**Conceito:** Limpar e preparar dados para análise  
-**Quando usar:** Quando precisa tratar dados inconsistentes, faltantes ou duplicados antes de salvar no banco.
 
 ---
 
@@ -532,20 +471,20 @@ pip install -r requirements.txt
 # Navegar para diretório de exemplos
 cd aulas/aula-02-python/exemplos
 
-# 🔥 BLOCO 1: Aquecimento Python (20min)
+# 🔥 EXEMPLO 00: Aquecimento Python
 python exemplo-00-aquecimento-fundamentos.py
-python exemplo-00c-introducao-pandas.py
 
-# 💾 BLOCO 2: Conectar com DataLake (20min)
-python exemplo-04-ler-arquivos-externos.py
+# 💾 EXEMPLO 01: Conectar com DataLake
+python exemplo-01-ler-datalake-parquet.py
 
-# 🗄️ BLOCO 3: Salvar no Banco de Dados (20min)
-python exemplo-05-ler-banco-dados.py
-python exemplo-07-exportar-dados.py
+# 🗄️ EXEMPLO 02: Salvar no Banco de Dados
+python exemplo-02-salvar-banco-dados.py
 
-# 🌐 BLOCO 4: Conectar com uma API (20min)
-python exemplo-00b-api-json.py
-python exemplo-03-ler-api-rest.py
+# 🎯 EXEMPLO 03: Projeto Completo (DataLake → Banco)
+python exemplo-03-projeto-completo.py
+
+# 🌐 EXEMPLO 04: Ler API Bitcoin
+python exemplo-04-ler-api-bitcoin.py
 ```
 
 ### 3. Modificar e Experimentar
@@ -561,33 +500,38 @@ python exemplo-03-ler-api-rest.py
 
 Após fazer todos os exemplos, você deve ser capaz de:
 
-### 🔥 Bloco 1: Aquecimento Python
+### 🔥 Exemplo 00: Aquecimento Python
 - [ ] Usar print e f-strings
-- [ ] Trabalhar com variáveis (str, int, float)
+- [ ] Trabalhar com variáveis (str, int)
 - [ ] Usar listas e dicionários
-- [ ] Entender o que é Pandas e por que usar
-- [ ] Criar Series e DataFrames
-- [ ] Fazer operações básicas com Pandas
+- [ ] Entender por que dicionários são essenciais para dados estruturados
+- [ ] Trabalhar com lista de dicionários
 
-### 💾 Bloco 2: Conectar com DataLake
+### 💾 Exemplo 01: Conectar com DataLake
 - [ ] Entender o que é um Data Lake
 - [ ] Usar boto3 para conectar com S3/Supabase Storage
-- [ ] Baixar arquivos de Data Lakes
-- [ ] Ler arquivos CSV e Parquet de Data Lakes
+- [ ] Listar arquivos no bucket
+- [ ] Baixar arquivos Parquet de Data Lakes
+- [ ] Ler Parquet e converter para DataFrame
+- [ ] Fazer análises básicas com Pandas
 - [ ] Compreender a importância de Data Lakes na indústria
 
-### 🗄️ Bloco 3: Salvar no Banco de Dados
-- [ ] Conectar Python com SQLite e PostgreSQL
-- [ ] Executar queries SQL e trazer para pandas
+### 🗄️ Exemplo 02: Salvar no Banco de Dados
+- [ ] Conectar Python com PostgreSQL usando SQLAlchemy
 - [ ] Salvar DataFrames em tabelas SQL
-- [ ] Exportar dados para diferentes formatos (CSV, JSON, Excel, Parquet)
+- [ ] Executar queries SQL e trazer para pandas
+- [ ] Atualizar tabelas existentes (append)
 
-### 🌐 Bloco 4: Conectar com uma API
-- [ ] Entender o que é API e JSON
-- [ ] Converter entre JSON e dicionários Python
-- [ ] Fazer requisições HTTP para APIs
-- [ ] Processar respostas de APIs
-- [ ] Integrar dados de múltiplas APIs
+### 🎯 Exemplo 03: Projeto Completo
+- [ ] Combinar boto3 + pandas + sqlalchemy
+- [ ] Criar pipeline completo DataLake → Banco
+- [ ] Entender fluxo EL (Extract, Load)
+
+### 🌐 Exemplo 04: Ler API Bitcoin
+- [ ] Entender o que é uma API
+- [ ] Usar biblioteca requests para fazer requisições HTTP
+- [ ] Processar dados JSON de APIs
+- [ ] Criar pipeline completo API → Processamento → Banco
 
 ---
 
@@ -636,17 +580,15 @@ Depois de dominar todos os exemplos:
 
 ## 📊 Resumo dos Conceitos por Exemplo
 
-| Bloco | Exemplo | Conceito Principal | Tempo |
-|-------|---------|-------------------|-------|
-| 🔥 1 | 00 | Fundamentos Python | 10min |
-| 🔥 1 | 00c | Introdução Pandas | 10min |
-| 💾 2 | 04 | DataLake (S3/Supabase) | 20min |
-| 🗄️ 3 | 05 | Banco de Dados | 10min |
-| 🗄️ 3 | 07 | Exportar Dados | 10min |
-| 🌐 4 | 00b | APIs e JSON | 10min |
-| 🌐 4 | 03 | API REST | 10min |
+| Exemplo | Conceito Principal | O que você aprende |
+|---------|-------------------|-------------------|
+| 🔥 00 | Fundamentos Python | Variáveis, listas, dicionários - base para trabalhar com dados |
+| 💾 01 | DataLake (S3/Supabase) | Conectar com Data Lakes, ler Parquet, análises com Pandas |
+| 🗄️ 02 | Salvar no PostgreSQL | Conectar Python com banco, salvar DataFrames, queries SQL |
+| 🎯 03 | Projeto Completo | Pipeline completo: DataLake → Banco (EL) |
+| 🌐 04 | API Bitcoin → Banco | Consumir APIs REST, processar JSON, salvar no banco |
 
-**Total: 4 blocos de 20 minutos cada = 80 minutos de aprendizado prático!** 🚀
+**Total: 5 exemplos práticos cobrindo todo o fluxo de ingestão de dados!** 🚀
 
 ---
 
