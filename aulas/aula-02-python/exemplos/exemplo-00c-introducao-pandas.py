@@ -24,21 +24,23 @@ import pandas as pd
 # ============================================
 
 # SEM PANDAS (usando listas):
-vendas = [
-    {"produto": "Smartphone", "quantidade": 2, "preco": 1299.90},
-    {"produto": "Notebook", "quantidade": 1, "preco": 3499.90},
-    {"produto": "Tablet", "quantidade": 3, "preco": 899.90}
+# GUARDE BEM ISSO: Lista de dicionários é a estrutura que Pandas usa por baixo!
+vendas_tenis = [
+    {"tenis": "Tênis Nike Air Max", "quantidade": 2, "preco": 599.90},
+    {"tenis": "Tênis Adidas Ultraboost", "quantidade": 1, "preco": 699.90},
+    {"tenis": "Tênis Puma RS-X", "quantidade": 3, "preco": 449.90}
 ]
 
 receita_total = 0
-for venda in vendas:
+for venda in vendas_tenis:
     receita = venda["quantidade"] * venda["preco"]
     receita_total += receita
 
 print(f"Receita total (sem Pandas): R$ {receita_total:,.2f}")
 
 # COM PANDAS (muito mais simples):
-df_vendas = pd.DataFrame(vendas)
+# GUARDE BEM ISSO: Pandas converte lista de dicionários em DataFrame automaticamente!
+df_vendas = pd.DataFrame(vendas_tenis)
 df_vendas["receita"] = df_vendas["quantidade"] * df_vendas["preco"]
 receita_total_pandas = df_vendas["receita"].sum()
 
@@ -51,43 +53,75 @@ print(f"\nDataFrame:\n{df_vendas}")
 # ============================================
 
 # Series = uma coluna de dados
-precos = pd.Series([1299.90, 3499.90, 899.90], name="precos")
-print(f"\nSeries de preços:\n{precos}")
-print(f"Média: R$ {precos.mean():,.2f}, Maior: R$ {precos.max():,.2f}, Menor: R$ {precos.min():,.2f}")
+precos_tenis = pd.Series([599.90, 699.90, 449.90, 399.90, 299.90], name="precos")
+print(f"\nSeries de preços de tênis:\n{precos_tenis}")
+print(f"Média: R$ {precos_tenis.mean():,.2f}, Maior: R$ {precos_tenis.max():,.2f}, Menor: R$ {precos_tenis.min():,.2f}")
 
 # DataFrame = múltiplas colunas (tabela)
-df_produtos = pd.DataFrame({
-    "produto": ["Smartphone", "Notebook", "Tablet"],
-    "preco": [1299.90, 3499.90, 899.90],
+# GUARDE BEM ISSO: DataFrame é como uma tabela Excel, mas muito mais poderoso!
+df_tenis = pd.DataFrame({
+    "tenis": ["Tênis Nike Air Max", "Tênis Adidas Ultraboost", "Tênis Puma RS-X"],
+    "marca": ["Nike", "Adidas", "Puma"],
+    "preco": [599.90, 699.90, 449.90],
     "quantidade": [10, 5, 15]
 })
 
-print(f"\nDataFrame:\n{df_produtos}")
-print(f"Formato: {df_produtos.shape} (linhas, colunas)")
+print(f"\nDataFrame de tênis:\n{df_tenis}")
+print(f"Formato: {df_tenis.shape} (linhas, colunas)")
 
 
 # ============================================
 # 3. OPERAÇÕES BÁSICAS COM PANDAS
 # ============================================
 
-df = pd.DataFrame({
-    "produto": ["Smartphone", "Notebook", "Tablet", "Fone"],
-    "categoria": ["Eletrônicos", "Informática", "Eletrônicos", "Acessórios"],
-    "preco": [1299.90, 3499.90, 899.90, 199.90],
-    "quantidade": [10, 5, 15, 20]
-})
+# GUARDE BEM ISSO: Lista de dicionários vira DataFrame facilmente!
+lista_tenis = [
+    {"tenis": "Tênis Nike Air Max", "marca": "Nike", "preco": 599.90, "quantidade": 10},
+    {"tenis": "Tênis Adidas Ultraboost", "marca": "Adidas", "preco": 699.90, "quantidade": 5},
+    {"tenis": "Tênis Puma RS-X", "marca": "Puma", "preco": 449.90, "quantidade": 15},
+    {"tenis": "Tênis Vans Old Skool", "marca": "Vans", "preco": 399.90, "quantidade": 20}
+]
+
+df = pd.DataFrame(lista_tenis)
 
 print(f"\nDataFrame original:\n{df}")
 
 # Filtrar dados
-produtos_caros = df[df["preco"] > 1000]
-print(f"\nProdutos acima de R$ 1.000:\n{produtos_caros}")
+tenis_caros = df[df["preco"] > 500]
+print(f"\nTênis acima de R$ 500:\n{tenis_caros}")
 
-# Agrupar por categoria
-receita_por_categoria = df.groupby("categoria")["preco"].sum()
-print(f"\nReceita por categoria:\n{receita_por_categoria}")
+# Agrupar por marca
+receita_por_marca = df.groupby("marca")["preco"].sum()
+print(f"\nReceita por marca:\n{receita_por_marca}")
 
 # Adicionar coluna calculada
 df["receita_total"] = df["preco"] * df["quantidade"]
 print(f"\nDataFrame com receita total:\n{df}")
+
+# ============================================
+# 4. LISTA DE TÊNIS COMPLETA
+# ============================================
+
+# GUARDE BEM ISSO: Esta é a estrutura mais comum que você vai usar!
+lista_completa_tenis = [
+    {"nome": "Tênis Nike Air Max", "marca": "Nike", "preco": 599.90, "tamanho": 42},
+    {"nome": "Tênis Adidas Ultraboost", "marca": "Adidas", "preco": 699.90, "tamanho": 41},
+    {"nome": "Tênis Puma RS-X", "marca": "Puma", "preco": 449.90, "tamanho": 40},
+    {"nome": "Tênis Vans Old Skool", "marca": "Vans", "preco": 399.90, "tamanho": 39},
+    {"nome": "Tênis Converse All Star", "marca": "Converse", "preco": 299.90, "tamanho": 38}
+]
+
+# Converter para DataFrame
+df_tenis_completo = pd.DataFrame(lista_completa_tenis)
+
+print(f"\n{'='*50}")
+print(f"DataFrame completo de {len(df_tenis_completo)} tênis:")
+print(f"{'='*50}")
+print(df_tenis_completo)
+
+print(f"\n💡 GUARDE BEM ISSO:")
+print(f"   - Lista de dicionários → DataFrame (conversão automática!)")
+print(f"   - Cada dicionário = uma linha")
+print(f"   - Cada chave = uma coluna")
+print(f"   - Pandas faz a mágica de organizar tudo!")
 

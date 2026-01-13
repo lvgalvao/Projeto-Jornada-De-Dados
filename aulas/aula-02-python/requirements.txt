@@ -7,9 +7,8 @@ numpy>=1.24.0
 # Requisições HTTP e APIs
 requests>=2.31.0
 
-# Web Scraping
-beautifulsoup4>=4.12.0
-lxml>=4.9.0
+# Data Lakes (S3, Supabase Storage, etc)
+boto3>=1.28.0  # Cliente AWS S3 (compatível com Supabase Storage)
 
 # Banco de dados
 sqlalchemy>=2.0.0

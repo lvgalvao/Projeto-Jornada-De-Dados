@@ -24,17 +24,19 @@ import json
 # ============================================
 
 # JSON é muito similar a dicionários Python!
+# GUARDE BEM ISSO: JSON = Dicionário Python (fácil conversão!)
 # Exemplo de JSON (como string):
 json_string = '''
 {
     "produto": {
-        "id": "prd_001",
-        "nome": "Smartphone Galaxy A54",
-        "preco": 1299.90,
-        "categoria": "Eletrônicos",
+        "id": "ten_001",
+        "nome": "Tênis Nike Air Max",
+        "preco": 599.90,
+        "categoria": "Tênis",
+        "marca": "Nike",
         "disponivel": true
     },
-    "vendas": [100, 150, 200]
+    "vendas": [50, 75, 100]
 }
 '''
 
@@ -42,8 +44,9 @@ json_string = '''
 dados_python = json.loads(json_string)
 
 # Acessar dados (igual a dicionário!)
-print(f"Nome do produto: {dados_python['produto']['nome']}")
+print(f"Nome do tênis: {dados_python['produto']['nome']}")
 print(f"Preço: R$ {dados_python['produto']['preco']}")
+print(f"Marca: {dados_python['produto']['marca']}")
 print(f"Vendas: {dados_python['vendas']}")
 
 
@@ -52,24 +55,34 @@ print(f"Vendas: {dados_python['vendas']}")
 # ============================================
 
 # Simulando uma resposta real de API
+# GUARDE BEM ISSO: APIs retornam listas de dicionários (estrutura muito comum!)
 resposta_api = {
     "status": "success",
     "data": {
-        "produtos": [
+        "tenis": [
             {
-                "id": "prd_001",
-                "nome": "Smartphone Galaxy A54",
-                "preco": "1299.90",
-                "categoria": "Eletrônicos"
+                "id": "ten_001",
+                "nome": "Tênis Nike Air Max",
+                "preco": "599.90",
+                "marca": "Nike",
+                "categoria": "Tênis"
             },
             {
-                "id": "prd_002",
-                "nome": "Notebook Dell Inspiron",
-                "preco": "3499.90",
-                "categoria": "Informática"
+                "id": "ten_002",
+                "nome": "Tênis Adidas Ultraboost",
+                "preco": "699.90",
+                "marca": "Adidas",
+                "categoria": "Tênis"
+            },
+            {
+                "id": "ten_003",
+                "nome": "Tênis Puma RS-X",
+                "preco": "449.90",
+                "marca": "Puma",
+                "categoria": "Tênis"
             }
         ],
-        "total": 2
+        "total": 3
     },
     "timestamp": "2024-01-15T10:30:00Z"
 }
@@ -79,18 +92,18 @@ resposta_api = {
 # 3. PROCESSAR DADOS DA API
 # ============================================
 
-# Extrair produtos
-produtos = resposta_api["data"]["produtos"]
+# Extrair lista de tênis
+lista_tenis = resposta_api["data"]["tenis"]
 
-print(f"\nTotal de produtos: {resposta_api['data']['total']}")
+print(f"\nTotal de tênis: {resposta_api['data']['total']}")
 
-for produto in produtos:
-    nome = produto["nome"]
-    preco_str = produto["preco"]
+for tenis in lista_tenis:
+    nome = tenis["nome"]
+    preco_str = tenis["preco"]
     preco_float = float(preco_str)  # Converter string para float
-    categoria = produto["categoria"]
+    marca = tenis["marca"]
     
-    print(f"  - {nome}: R$ {preco_float:,.2f} ({categoria})")
+    print(f"  - {nome} ({marca}): R$ {preco_float:,.2f}")
 
 
 # ============================================
@@ -98,9 +111,11 @@ for produto in produtos:
 # ============================================
 
 # Converter dicionário Python para JSON (string)
+# GUARDE BEM ISSO: Você pode converter dicionário Python para JSON quando precisar enviar dados para APIs!
 dados_python = {
-    "nome": "Smartphone",
-    "preco": 1299.90,
+    "nome": "Tênis Nike Air Max",
+    "marca": "Nike",
+    "preco": 599.90,
     "disponivel": True
 }
 
@@ -112,28 +127,102 @@ print(f"\nJSON string:\n{json_string}")
 # 5. EXEMPLO COMPLETO: PROCESSAR API
 # ============================================
 
-def processar_produto_api(dados_produto):
+def processar_tenis_api(dados_tenis):
     """
-    Processa dados de um produto vindo da API
+    Processa dados de um tênis vindo da API
     """
-    nome = dados_produto["nome"]
-    preco = float(dados_produto["preco"])
-    categoria = dados_produto["categoria"]
+    nome = dados_tenis["nome"]
+    preco = float(dados_tenis["preco"])
+    marca = dados_tenis.get("marca", "Não informada")
+    categoria = dados_tenis["categoria"]
     
     return {
         "nome_formatado": nome.upper(),
         "preco_formatado": f"R$ {preco:,.2f}",
+        "marca": marca,
         "categoria": categoria
     }
 
 # Simular dados de API
-produto_api = {
-    "nome": "Smartphone Galaxy A54",
-    "preco": "1299.90",
-    "categoria": "Eletrônicos"
+tenis_api = {
+    "nome": "Tênis Nike Air Max",
+    "preco": "599.90",
+    "marca": "Nike",
+    "categoria": "Tênis"
 }
 
 # Processar
-produto_processado = processar_produto_api(produto_api)
-print(f"\nDados processados: {produto_processado}")
+tenis_processado = processar_tenis_api(tenis_api)
+print(f"\nDados processados: {tenis_processado}")
+
+
+# ============================================
+# 6. LISTA COMPLETA DE TÊNIS (DICIONÁRIOS)
+# ============================================
+
+# GUARDE BEM ISSO: Lista de dicionários é a estrutura perfeita para dados tabulares!
+# Cada dicionário = uma linha, cada chave = uma coluna
+lista_completa_tenis = [
+    {
+        "id": "ten_001",
+        "nome": "Tênis Nike Air Max",
+        "marca": "Nike",
+        "preco": 599.90,
+        "categoria": "Tênis",
+        "tamanho": 42,
+        "cor": "Preto/Branco"
+    },
+    {
+        "id": "ten_002",
+        "nome": "Tênis Adidas Ultraboost",
+        "marca": "Adidas",
+        "preco": 699.90,
+        "categoria": "Tênis",
+        "tamanho": 41,
+        "cor": "Branco"
+    },
+    {
+        "id": "ten_003",
+        "nome": "Tênis Puma RS-X",
+        "marca": "Puma",
+        "preco": 449.90,
+        "categoria": "Tênis",
+        "tamanho": 40,
+        "cor": "Preto"
+    },
+    {
+        "id": "ten_004",
+        "nome": "Tênis Vans Old Skool",
+        "marca": "Vans",
+        "preco": 399.90,
+        "categoria": "Tênis",
+        "tamanho": 39,
+        "cor": "Preto/Branco"
+    },
+    {
+        "id": "ten_005",
+        "nome": "Tênis Converse All Star",
+        "marca": "Converse",
+        "preco": 299.90,
+        "categoria": "Tênis",
+        "tamanho": 38,
+        "cor": "Branco"
+    }
+]
+
+print(f"\n{'='*50}")
+print(f"Lista completa de {len(lista_completa_tenis)} tênis:")
+print(f"{'='*50}")
+
+for tenis in lista_completa_tenis:
+    print(f"\n{tenis['nome']} ({tenis['marca']})")
+    print(f"  Preço: R$ {tenis['preco']:.2f}")
+    print(f"  Tamanho: {tenis['tamanho']}")
+    print(f"  Cor: {tenis['cor']}")
+
+print(f"\n💡 GUARDE BEM ISSO:")
+print(f"   - Lista de dicionários = estrutura perfeita para dados tabulares")
+print(f"   - Cada dicionário = uma linha (registro)")
+print(f"   - Cada chave = uma coluna (atributo)")
+print(f"   - Pandas converte isso facilmente em DataFrame!")
 
