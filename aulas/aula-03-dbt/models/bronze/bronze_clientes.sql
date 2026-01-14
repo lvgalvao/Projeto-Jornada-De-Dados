@@ -13,12 +13,10 @@
 -- Objetivo: Capturar dados exatamente como vêm da fonte
 
 SELECT
-    id,
+    id_cliente,
     nome_cliente,
-    email,
-    telefone,
-    cidade,
     estado,
+    pais,
     data_cadastro
 FROM {{ source('raw', 'clientes') }}
 

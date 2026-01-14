@@ -20,13 +20,12 @@
 -- - Valida integridade dos dados
 
 SELECT
-    id,
+    id_produto,
     UPPER(TRIM(nome_produto)) AS nome_produto,
     UPPER(TRIM(categoria)) AS categoria,
     UPPER(TRIM(marca)) AS marca,
     preco_atual,
-    COALESCE(estoque_atual, 0) AS estoque_atual,
-    data_cadastro,
+    data_criacao,
     -- Colunas calculadas
     CASE 
         WHEN preco_atual > 1000 THEN 'PREMIUM'

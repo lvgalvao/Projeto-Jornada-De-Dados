@@ -15,7 +15,6 @@
 SELECT
     cliente_id,
     nome_cliente,
-    cidade,
     estado,
     receita_total,
     total_compras,

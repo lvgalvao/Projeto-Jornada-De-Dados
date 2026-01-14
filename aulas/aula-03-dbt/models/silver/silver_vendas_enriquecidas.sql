@@ -16,9 +16,9 @@
 -- para criar uma visão completa e pronta para análise
 
 SELECT
-    v.id AS venda_id,
-    v.cliente_id,
-    v.produto_id,
+    v.id_venda AS venda_id,
+    v.id_cliente,
+    v.id_produto,
     v.quantidade,
     v.preco_unitario,
     v.receita_total,
@@ -37,13 +37,12 @@ SELECT
     p.faixa_preco,
     -- Dados do cliente
     c.nome_cliente,
-    c.cidade,
     c.estado
 FROM {{ ref('silver_vendas') }} v
 LEFT JOIN {{ ref('silver_produtos') }} p
-    ON v.produto_id = p.id
+    ON v.id_produto = p.id_produto
 LEFT JOIN {{ ref('silver_clientes') }} c
-    ON v.cliente_id = c.id
+    ON v.id_cliente = c.id_cliente
 WHERE v.flag_quantidade_invalida = FALSE
   AND v.flag_preco_invalido = FALSE
 

@@ -13,12 +13,12 @@
 -- Objetivo: Capturar dados exatamente como vêm da fonte
 
 SELECT
-    id,
-    cliente_id,
-    produto_id,
-    quantidade,
-    preco_unitario,
+    id_venda,
     data_venda,
-    canal_venda
+    id_cliente,
+    id_produto,
+    canal_venda,
+    quantidade,
+    preco_unitario
 FROM {{ source('raw', 'vendas') }}
 

@@ -13,8 +13,7 @@
 -- Objetivo: Capturar dados exatamente como vêm da fonte
 
 SELECT
-    id,
-    produto_id,
+    id_produto,
     nome_concorrente,
     preco_concorrente,
     data_coleta

@@ -30,7 +30,7 @@ SELECT
     SUM(receita_total) AS receita_total,
     SUM(quantidade) AS quantidade_total,
     COUNT(DISTINCT venda_id) AS total_vendas,
-    COUNT(DISTINCT cliente_id) AS total_clientes_unicos,
+    COUNT(DISTINCT id_cliente) AS total_clientes_unicos,
     AVG(receita_total) AS ticket_medio
 FROM {{ ref('silver_vendas_enriquecidas') }}
 GROUP BY 1, 2, 3, 4, 5, 6

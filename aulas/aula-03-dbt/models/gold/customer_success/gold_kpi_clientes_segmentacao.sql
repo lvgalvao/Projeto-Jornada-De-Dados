@@ -19,23 +19,21 @@
 
 WITH receita_por_cliente AS (
     SELECT
-        cliente_id,
+        id_cliente,
         nome_cliente,
-        cidade,
         estado,
         SUM(receita_total) AS receita_total,
         COUNT(DISTINCT venda_id) AS total_compras,
         AVG(receita_total) AS ticket_medio,
-        MIN(data_venda) AS primeira_compra,
-        MAX(data_venda) AS ultima_compra
+        MIN(data_venda_date) AS primeira_compra,
+        MAX(data_venda_date) AS ultima_compra
     FROM {{ ref('silver_vendas_enriquecidas') }}
-    GROUP BY 1, 2, 3, 4
+    GROUP BY 1, 2, 3
 )
 
 SELECT
-    cliente_id,
+    id_cliente AS cliente_id,
     nome_cliente,
-    cidade,
     estado,
     receita_total,
     total_compras,

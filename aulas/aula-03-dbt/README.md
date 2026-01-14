@@ -343,35 +343,32 @@ Fonte → Data Warehouse → [Transformação DENTRO]
 
 ### 📊 As 3 Camadas
 
-```
-┌─────────────────────────────────────────┐
-│         FONTES DE DADOS                 │
-│  (APIs, Bancos, Arquivos, Data Lakes)  │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  🥉 BRONZE (Raw Data)                   │
-│  - Dados brutos, sem transformação      │
-│  - Cópia exata da fonte                 │
-│  - Permite replay/reprocessamento       │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  🥈 SILVER (Cleaned Data)              │
-│  - Dados limpos e padronizados          │
-│  - Validações e enriquecimentos         │
-│  - Prontos para análise                 │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  🥇 GOLD (Business Metrics)             │
-│  - KPIs e métricas de negócio           │
-│  - Agregações e análises                 │
-│  - Prontos para dashboards              │
-└─────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph "🌐 Fontes de Dados"
+        FONTES[APIs, Bancos, Arquivos, Data Lakes]
+    end
+    
+    subgraph "🥉 BRONZE - Raw Data"
+        BRONZE[Dados Brutos<br/>- Sem transformação<br/>- Cópia exata da fonte<br/>- Permite replay/reprocessamento]
+    end
+    
+    subgraph "🥈 SILVER - Cleaned Data"
+        SILVER[Dados Limpos<br/>- Padronizados<br/>- Validações aplicadas<br/>- Enriquecimentos<br/>- Prontos para análise]
+    end
+    
+    subgraph "🥇 GOLD - Business Metrics (Data Marts)"
+        GOLD[KPIs e Métricas<br/>📊 Sales<br/>👥 Customer Success<br/>💰 Pricing<br/>- Agregações complexas<br/>- Rankings e segmentações<br/>- Prontos para dashboards]
+    end
+    
+    FONTES -->|Extract & Load| BRONZE
+    BRONZE -->|Transform & Clean| SILVER
+    SILVER -->|Aggregate & Model| GOLD
+    
+    style FONTES fill:#E8F4F8,stroke:#4A90E2,stroke-width:2px
+    style BRONZE fill:#F5E6D3,stroke:#D4A574,stroke-width:2px
+    style SILVER fill:#E8E8E8,stroke:#A0A0A0,stroke-width:2px
+    style GOLD fill:#FFD700,stroke:#FFA500,stroke-width:2px
 ```
 
 ### 🥉 Camada Bronze (Raw Data)
@@ -428,20 +425,26 @@ WHERE nome_produto IS NOT NULL  -- Validação
 - Qualidade garantida
 - Estrutura consistente
 
-### 🥇 Camada Gold (Business Metrics)
+### 🥇 Camada Gold (Business Metrics e Data Marts)
 
-**Objetivo:** Criar métricas de negócio prontas para análise
+**Objetivo:** Criar métricas de negócio prontas para análise, organizadas em Data Marts
 
 **Características:**
 - ✅ KPIs e métricas de negócio
+- ✅ Organizados em Data Marts (áreas de negócio)
 - ✅ Agregações complexas
 - ✅ Rankings e segmentações
 - ✅ Dados prontos para dashboards
 - ✅ Schema otimizado para consumo
 
+**Data Marts:**
+- 📊 **Sales**: KPIs de vendas, receita e performance de produtos
+- 👥 **Customer Success**: KPIs de clientes, segmentação e comportamento
+- 💰 **Pricing**: KPIs de preços e análise competitiva
+
 **Exemplo:**
 ```sql
--- gold_kpi_produtos_top_receita.sql
+-- sales/gold_kpi_produtos_top_receita.sql
 SELECT
     produto_id,
     nome_produto,
@@ -505,17 +508,20 @@ aula-03-dbt/
 │   │   ├── silver_vendas.sql
 │   │   ├── silver_preco_competidores.sql
 │   │   └── silver_vendas_enriquecidas.sql
-│   └── gold/                # 🥇 KPIs e métricas
-│       ├── gold_kpi_produtos_top_receita.sql
-│       ├── gold_kpi_produtos_top_quantidade.sql
-│       ├── gold_kpi_clientes_segmentacao.sql
-│       ├── gold_kpi_clientes_top.sql
-│       ├── gold_kpi_receita_por_categoria.sql
-│       ├── gold_kpi_receita_por_canal.sql
-│       ├── gold_kpi_receita_por_marca.sql
-│       ├── gold_kpi_vendas_temporais.sql
-│       ├── gold_kpi_precos_competitividade.sql
-│       └── gold_kpi_produtos_criticos_preco.sql
+│   └── gold/                # 🥇 KPIs e métricas (Data Marts)
+│       ├── sales/           # 📊 Data Mart: Vendas & Receita
+│       │   ├── gold_kpi_produtos_top_receita.sql
+│       │   ├── gold_kpi_produtos_top_quantidade.sql
+│       │   ├── gold_kpi_receita_por_categoria.sql
+│       │   ├── gold_kpi_receita_por_canal.sql
+│       │   ├── gold_kpi_receita_por_marca.sql
+│       │   └── gold_kpi_vendas_temporais.sql
+│       ├── customer_success/  # 👥 Data Mart: Customer Success
+│       │   ├── gold_kpi_clientes_segmentacao.sql
+│       │   └── gold_kpi_clientes_top.sql
+│       └── pricing/         # 💰 Data Mart: Pricing & Competitividade
+│           ├── gold_kpi_precos_competitividade.sql
+│           └── gold_kpi_produtos_criticos_preco.sql
 ├── macros/                   # Macros reutilizáveis
 ├── tests/                    # Testes de qualidade
 └── _sources.yml             # Definição de fontes de dados
@@ -525,60 +531,74 @@ aula-03-dbt/
 
 ## 🎯 KPIs Criados (Recriando Aula 01)
 
-Este projeto recria os principais KPIs da **Aula 01 (SQL)** usando dbt e arquitetura Medalhão:
+Este projeto recria os principais KPIs da **Aula 01 (SQL)** usando dbt e arquitetura Medalhão. Os KPIs estão organizados em **3 Data Marts** (áreas de negócio), seguindo o padrão usado pelas empresas:
 
-### 📊 Análise de Produtos
+### 📊 Data Mart: Sales (Vendas & Receita)
 
-1. **Top Produtos por Receita** (`gold_kpi_produtos_top_receita`)
+**Foco:** Análise de vendas, receita e performance de produtos
+
+1. **Top Produtos por Receita** (`sales/gold_kpi_produtos_top_receita`)
    - Top 10 produtos que geram mais receita
    - Ranking geral e por categoria
 
-2. **Top Produtos por Quantidade** (`gold_kpi_produtos_top_quantidade`)
+2. **Top Produtos por Quantidade** (`sales/gold_kpi_produtos_top_quantidade`)
    - Top 10 produtos mais vendidos
    - Quantidade total vendida
 
-### 👥 Análise de Clientes
-
-3. **Segmentação de Clientes** (`gold_kpi_clientes_segmentacao`)
-   - Segmentação: VIP, TOP_TIER, REGULAR
-   - Baseado em receita total
-   - Ticket médio e frequência de compra
-
-4. **Top Clientes** (`gold_kpi_clientes_top`)
-   - Top 10 clientes por receita
-   - Dados de segmentação incluídos
-
-### 💰 Análise de Receita
-
-5. **Receita por Categoria** (`gold_kpi_receita_por_categoria`)
+3. **Receita por Categoria** (`sales/gold_kpi_receita_por_categoria`)
    - Receita total por categoria
    - Percentual da receita total
 
-6. **Receita por Canal** (`gold_kpi_receita_por_canal`)
+4. **Receita por Canal** (`sales/gold_kpi_receita_por_canal`)
    - Receita por canal de venda (ecommerce vs loja_fisica)
    - Comparação entre canais
 
-7. **Receita por Marca** (`gold_kpi_receita_por_marca`)
+5. **Receita por Marca** (`sales/gold_kpi_receita_por_marca`)
    - Receita total por marca
    - Análise de performance por marca
 
-### 📈 Análise Temporal
-
-8. **Vendas Temporais** (`gold_kpi_vendas_temporais`)
+6. **Vendas Temporais** (`sales/gold_kpi_vendas_temporais`)
    - Vendas por dia, mês, ano
    - Vendas por dia da semana
    - Vendas por horário do dia
 
-### 🏪 Análise Competitiva
+### 👥 Data Mart: Customer Success
 
-9. **Competitividade de Preços** (`gold_kpi_precos_competitividade`)
+**Foco:** Análise de clientes, segmentação e comportamento
+
+7. **Segmentação de Clientes** (`customer_success/gold_kpi_clientes_segmentacao`)
+   - Segmentação: VIP, TOP_TIER, REGULAR
+   - Baseado em receita total
+   - Ticket médio e frequência de compra
+
+8. **Top Clientes** (`customer_success/gold_kpi_clientes_top`)
+   - Top 10 clientes por receita
+   - Dados de segmentação incluídos
+
+### 💰 Data Mart: Pricing (Preços & Competitividade)
+
+**Foco:** Análise de preços, competitividade e mercado
+
+9. **Competitividade de Preços** (`pricing/gold_kpi_precos_competitividade`)
    - Comparação de preços vs concorrentes
    - Diferença percentual
    - Classificação (mais caro, mais barato, na média)
 
-10. **Produtos Críticos (Preço)** (`gold_kpi_produtos_criticos_preco`)
+10. **Produtos Críticos (Preço)** (`pricing/gold_kpi_produtos_criticos_preco`)
     - Produtos top sellers que estão mais caros que o mercado
     - Produtos que precisam de ajuste de preço urgente
+
+---
+
+### 🏢 Por que Data Marts?
+
+**Data Marts** são subconjuntos de dados organizados por área de negócio. Esta organização oferece:
+
+- ✅ **Foco**: Cada área tem seus KPIs específicos
+- ✅ **Performance**: Consultas mais rápidas (dados organizados)
+- ✅ **Manutenção**: Mais fácil de manter e atualizar
+- ✅ **Colaboração**: Times diferentes trabalham em áreas diferentes
+- ✅ **Segurança**: Permissões por área de negócio
 
 ---
 
@@ -634,6 +654,11 @@ dbt run --select tag:gold
 # Executar modelo específico
 dbt run --select gold_kpi_produtos_top_receita
 
+# Executar data mart específico
+dbt run --select sales.*
+dbt run --select customer_success.*
+dbt run --select pricing.*
+
 # Executar com dependências
 dbt run --select gold_kpi_produtos_top_receita+
 ```
@@ -662,6 +687,157 @@ dbt test --select gold_kpi_produtos_top_receita
 
 ## 📚 Conceitos dbt Importantes
 
+### `{{ config() }}` - Configuração de Modelos
+
+O bloco `{{ config() }}` é usado no início de cada modelo dbt para definir como ele será executado e organizado. É uma das funcionalidades mais importantes do dbt!
+
+**Exemplo:**
+```sql
+{{
+    config(
+        materialized='view',
+        schema='bronze',
+        tags=['bronze', 'raw', 'clientes']
+    )
+}}
+
+SELECT * FROM {{ source('raw', 'clientes') }}
+```
+
+#### Parâmetros do `{{ config() }}`
+
+##### 1. `materialized` - Como o modelo será salvo no banco
+
+Define o tipo de objeto que será criado no Data Warehouse:
+
+- **`view`** (padrão): Cria uma VIEW
+  - ✅ Sempre atualizada (reflete dados mais recentes)
+  - ✅ Não ocupa espaço (apenas query)
+  - ✅ Mais lento para consultas complexas
+  - **Uso**: Bronze (dados brutos que mudam pouco)
+
+- **`table`**: Cria uma TABLE
+  - ✅ Mais rápido para consultas
+  - ✅ Ocupa espaço no banco
+  - ✅ Precisa ser recriada para atualizar
+  - **Uso**: Silver e Gold (dados processados, consultas frequentes)
+
+- **`incremental`**: Atualiza apenas novos dados
+  - ✅ Eficiente para grandes volumes
+  - ✅ Apenas processa dados novos
+  - **Uso**: Tabelas grandes que crescem ao longo do tempo
+
+- **`ephemeral`**: Não cria objeto no banco
+  - ✅ Apenas uma CTE (Common Table Expression)
+  - ✅ Usado por outros modelos
+  - **Uso**: Modelos intermediários que não precisam ser consultados diretamente
+
+**Exemplo:**
+```sql
+-- Bronze: view (sempre atualizado)
+{{
+    config(materialized='view', schema='bronze')
+}}
+
+-- Silver: table (performance)
+{{
+    config(materialized='table', schema='silver')
+}}
+
+-- Gold: table (KPIs prontos)
+{{
+    config(materialized='table', schema='gold')
+}}
+```
+
+##### 2. `schema` - Schema do banco onde será criado
+
+Define em qual schema (namespace) do banco de dados o modelo será criado:
+
+- **`schema='bronze'`**: Modelos da camada Bronze
+- **`schema='silver'`**: Modelos da camada Silver
+- **`schema='gold'`**: Modelos da camada Gold
+
+**Por que usar schemas diferentes?**
+- ✅ Organização clara das camadas
+- ✅ Permissões diferentes por camada
+- ✅ Fácil identificar origem dos dados
+- ✅ Melhor gestão de acesso
+
+**Exemplo:**
+```sql
+-- Modelo será criado em: bronze.bronze_clientes
+{{
+    config(
+        materialized='view',
+        schema='bronze'
+    )
+}}
+```
+
+##### 3. `tags` - Tags para organização e seleção
+
+Tags são etiquetas que permitem organizar e selecionar modelos:
+
+- ✅ **Organização**: Agrupar modelos relacionados
+- ✅ **Seleção**: Executar apenas modelos com certas tags
+- ✅ **Documentação**: Identificar propósito do modelo
+
+**Exemplo:**
+```sql
+{{
+    config(
+        tags=['bronze', 'raw', 'clientes']
+    )
+}}
+```
+
+**Tags comuns neste projeto:**
+- `bronze`, `silver`, `gold` - Camada do modelo
+- `raw`, `cleaned`, `kpi` - Tipo de dados
+- `produtos`, `clientes`, `vendas` - Entidade de negócio
+- `sales`, `customer_success`, `pricing` - Data Mart
+
+**Como usar tags:**
+```bash
+# Executar apenas modelos Bronze
+dbt run --select tag:bronze
+
+# Executar apenas KPIs
+dbt run --select tag:kpi
+
+# Executar modelos de clientes
+dbt run --select tag:clientes
+
+# Executar múltiplas tags
+dbt run --select tag:gold tag:sales
+```
+
+#### Exemplo Completo
+
+```sql
+{{
+    config(
+        materialized='table',        # Cria uma tabela
+        schema='gold',               # No schema 'gold'
+        tags=['gold', 'kpi', 'sales', 'produtos']  # Tags para organização
+    )
+}}
+
+SELECT
+    produto_id,
+    SUM(receita_total) AS receita_total
+FROM {{ ref('silver_vendas_enriquecidas') }}
+GROUP BY produto_id
+```
+
+**Resultado:**
+- ✅ Tabela criada em: `gold.gold_kpi_produtos_top_receita`
+- ✅ Pode ser selecionada com: `dbt run --select tag:gold tag:sales`
+- ✅ Performance otimizada (table ao invés de view)
+
+---
+
 ### `{{ ref() }}` - Referenciar Outros Modelos
 
 ```sql
@@ -669,6 +845,14 @@ dbt test --select gold_kpi_produtos_top_receita
 SELECT * FROM {{ ref('silver_vendas') }}
 -- dbt resolve a dependência automaticamente
 ```
+
+**Por que usar `{{ ref() }}`?**
+- ✅ dbt resolve dependências automaticamente
+- ✅ Ordem de execução correta
+- ✅ Linha de execução visual (dbt docs)
+- ✅ Evita erros de dependência
+
+---
 
 ### `{{ source() }}` - Referenciar Fontes de Dados
 
@@ -678,6 +862,14 @@ SELECT * FROM {{ source('raw', 'produtos') }}
 -- Define a fonte de dados original
 ```
 
+**Por que usar `{{ source() }}`?**
+- ✅ Documenta origem dos dados
+- ✅ Testes de qualidade nas fontes
+- ✅ Alerta quando fonte muda
+- ✅ Rastreabilidade completa
+
+---
+
 ### `{{ var() }}` - Variáveis do Projeto
 
 ```sql
@@ -685,22 +877,10 @@ SELECT * FROM {{ source('raw', 'produtos') }}
 LIMIT {{ var('top_n_produtos', 10) }}
 ```
 
-### Tags - Organizar Modelos
-
-```sql
-{{
-    config(
-        tags=['gold', 'kpi', 'produtos']
-    )
-}}
-```
-
-### Materialização - Como Salvar
-
-- **`view`**: Cria uma VIEW (atualizada sempre)
-- **`table`**: Cria uma TABLE (mais rápido para consultas)
-- **`incremental`**: Atualiza apenas novos dados
-- **`ephemeral`**: Não cria objeto, apenas CTE
+**Por que usar variáveis?**
+- ✅ Valores configuráveis
+- ✅ Fácil ajustar sem mudar código
+- ✅ Diferentes valores por ambiente (dev, prod)
 
 ---
 
@@ -717,8 +897,9 @@ LIMIT {{ var('top_n_produtos', 10) }}
 - Enriquecer dados com colunas calculadas
 - Usar `{{ ref() }}` para referenciar Bronze
 
-### 3. **Camada Gold** (KPIs)
+### 3. **Camada Gold** (KPIs e Data Marts)
 - Criar métricas de negócio
+- Organizar KPIs em Data Marts (áreas de negócio)
 - Fazer agregações complexas
 - Criar rankings e segmentações
 - Usar `{{ ref() }}` para referenciar Silver

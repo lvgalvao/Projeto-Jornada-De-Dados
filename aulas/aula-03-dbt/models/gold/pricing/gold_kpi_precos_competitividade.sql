@@ -19,7 +19,7 @@
 
 WITH precos_por_produto AS (
     SELECT
-        p.id AS produto_id,
+        p.id_produto,
         p.nome_produto,
         p.categoria,
         p.marca,
@@ -30,14 +30,14 @@ WITH precos_por_produto AS (
         COUNT(DISTINCT pc.nome_concorrente) AS total_concorrentes
     FROM {{ ref('silver_produtos') }} p
     LEFT JOIN {{ ref('silver_preco_competidores') }} pc
-        ON p.id = pc.produto_id
+        ON p.id_produto = pc.id_produto
     WHERE pc.flag_preco_invalido = FALSE
     GROUP BY 1, 2, 3, 4, 5
 ),
 
 vendas_por_produto AS (
     SELECT
-        produto_id,
+        id_produto,
         SUM(receita_total) AS receita_total,
         SUM(quantidade) AS quantidade_total
     FROM {{ ref('silver_vendas_enriquecidas') }}
@@ -45,7 +45,7 @@ vendas_por_produto AS (
 )
 
 SELECT
-    pp.produto_id,
+    pp.id_produto AS produto_id,
     pp.nome_produto,
     pp.categoria,
     pp.marca,
@@ -78,7 +78,7 @@ SELECT
     COALESCE(vp.quantidade_total, 0) AS quantidade_total
 FROM precos_por_produto pp
 LEFT JOIN vendas_por_produto vp
-    ON pp.produto_id = vp.produto_id
+    ON pp.id_produto = vp.id_produto
 WHERE pp.preco_medio_concorrentes IS NOT NULL
 ORDER BY diferenca_percentual_vs_media DESC
 

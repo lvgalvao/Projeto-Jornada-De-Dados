@@ -14,7 +14,7 @@
 
 WITH vendas_por_produto AS (
     SELECT
-        produto_id,
+        id_produto,
         nome_produto,
         categoria,
         marca,
@@ -26,7 +26,7 @@ WITH vendas_por_produto AS (
 )
 
 SELECT
-    produto_id,
+    id_produto AS produto_id,
     nome_produto,
     categoria,
     marca,

@@ -19,12 +19,11 @@
 -- - Permite reprocessamento sem acessar fonte original
 
 SELECT
-    id,
+    id_produto,
     nome_produto,
     categoria,
     marca,
     preco_atual,
-    estoque_atual,
-    data_cadastro
+    data_criacao
 FROM {{ source('raw', 'produtos') }}
 
