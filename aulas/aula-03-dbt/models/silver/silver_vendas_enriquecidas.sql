@@ -23,6 +23,7 @@ SELECT
     v.preco_unitario,
     v.receita_total,
     v.data_venda,
+    v.data_venda_date,
     v.canal_venda,
     v.ano_venda,
     v.mes_venda,

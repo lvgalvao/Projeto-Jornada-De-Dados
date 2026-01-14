@@ -373,26 +373,156 @@ flowchart TD
 
 ### 🥉 Camada Bronze (Raw Data)
 
-**Objetivo:** Capturar dados exatamente como vêm da fonte
+**Objetivo:** Capturar dados exatamente como vêm da fonte e criar o **contrato mínimo do dado**
 
 **Características:**
-- ✅ Dados brutos, sem transformação
-- ✅ Cópia exata da fonte original
+- ✅ Dados brutos, com transformações mínimas
+- ✅ Padronização básica (nomes, tipos)
 - ✅ Permite replay (reprocessar se necessário)
 - ✅ Histórico completo
-- ✅ Schema simples (espelha fonte)
+- ✅ Schema estável (contrato fixo)
 
 **Exemplo:**
 ```sql
 -- bronze_produtos.sql
-SELECT * FROM {{ source('raw', 'produtos') }}
--- Dados exatamente como vêm da fonte
+SELECT
+    id_produto,
+    nome_produto,
+    categoria,
+    marca,
+    preco_atual,
+    data_criacao
+FROM {{ source('raw', 'produtos') }}
+-- Dados padronizados e com formato fixo
 ```
 
-**Por que Bronze?**
-- Ponto de recuperação (se algo der errado)
-- Permite reprocessar sem acessar fonte original
-- Histórico completo para auditoria
+---
+
+## 🤔 Por que Bronze? A Importância da Camada Bronze
+
+**Por que o dbt recomenda raw → bronze (mesmo parecendo redundante)?**
+
+**Porque dbt NÃO é ferramenta de ingestão. Ele é uma ferramenta de transformação confiável.**
+
+A camada bronze é o ponto onde o dbt passa a ter **controle total sobre o dado**.
+
+### 1️⃣ Raw não é confiável para analytics
+
+A tabela `raw.*` geralmente:
+- ❌ Vem de scraping, APIs, dumps, CDC
+- ❌ Pode mudar schema sem aviso
+- ❌ Pode ter duplicatas
+- ❌ Pode chegar parcialmente
+- ❌ Pode ser reprocessada
+
+**👉 dbt não confia nisso direto**
+
+O dbt assume que:
+> "Se eu vou construir algo em cima, preciso congelar a forma do dado primeiro."
+
+**É isso que o bronze faz.**
+
+### 2️⃣ Bronze é o contrato mínimo do dado
+
+Quando você cria:
+```
+raw.vendas → bronze_vendas
+```
+
+Você está dizendo:
+> "A partir daqui, o formato é meu."
+
+**No bronze você normalmente:**
+- ✅ Seleciona colunas explícitas
+- ✅ Padroniza nomes
+- ✅ Força tipos (cast)
+- ✅ Remove lixo óbvio
+- ✅ Adiciona `loaded_at`, `source`, `hash`
+
+**Exemplo mental:**
+```sql
+SELECT
+    CAST(id_venda AS INT) AS id_venda,
+    CAST(preco AS NUMERIC) AS preco,
+    CAST(data_venda AS TIMESTAMP) AS data_venda,
+    NOW() AS ingested_at
+FROM raw.vendas
+```
+
+**👉 Isso cria estabilidade.**
+
+### 3️⃣ Isola impacto de mudanças no upstream
+
+**Imagine:**
+- API mudou `price` → `unit_price`
+- Scraper quebrou um campo
+- Coluna nova apareceu
+
+**Se você pula o bronze:**
+- ❌ Quebra silver
+- ❌ Quebra marts
+- ❌ Quebra BI
+- ❌ Quebra confiança
+
+**Com bronze:**
+```
+raw → bronze (ajusta)
+bronze → silver (segue intacto)
+```
+
+**👉 Uma mudança, um lugar para corrigir**
+
+### 4️⃣ Facilita debug e auditoria
+
+Quando alguém pergunta:
+> "De onde veio esse número?"
+
+Você consegue responder em camadas:
+- `raw` → dado original
+- `bronze` → dado padronizado
+- `silver` → regra de negócio
+- `gold` → métrica
+
+**Sem bronze:**
+- ❌ Tudo vira uma query gigante
+- ❌ Debugging vira inferno
+- ❌ dbt tests perdem sentido
+
+### 5️⃣ dbt tests fazem MAIS sentido no bronze
+
+É no bronze que você começa a testar:
+- ✅ `not_null`
+- ✅ `unique`
+- ✅ `accepted_values`
+- ✅ `relationships` (básicos)
+
+**👉 Testar raw geralmente não faz sentido**  
+**👉 Testar bronze faz muito**
+
+### 6️⃣ Medallion ≠ Databricks (isso é importante)
+
+**Muita gente acha que:**
+> "Bronze / Silver / Gold é coisa de Databricks"
+
+**❌ Errado!**
+
+O dbt adota essa ideia porque ela resolve **governança + escala**, mesmo em:
+- PostgreSQL
+- BigQuery
+- Snowflake
+- Redshift
+- Supabase
+
+**O conceito é lógico, não tecnológico.**
+
+---
+
+### 📝 Resumo Curto (Frase de Arquiteto 😄)
+
+> **Raw é ingestão.**  
+> **Bronze é controle.**  
+> **Silver é regra de negócio.**  
+> **Gold é decisão.**
 
 ### 🥈 Camada Silver (Cleaned Data)
 
@@ -494,21 +624,22 @@ LIMIT 10
 
 ```
 aula-03-dbt/
-├── dbt_project.yml          # Configurações do projeto
+├── dbt_project.yml          # 📋 PASSO 1: Configurações do projeto
 ├── profiles.yml              # Configurações de conexão (referência)
 ├── models/
-│   ├── bronze/              # 🥉 Dados brutos
+│   ├── _sources.yml         # 📋 PASSO 2: Definição de fontes de dados
+│   ├── bronze/              # 📋 PASSO 3: 🥉 Dados brutos
 │   │   ├── bronze_produtos.sql
 │   │   ├── bronze_clientes.sql
 │   │   ├── bronze_vendas.sql
 │   │   └── bronze_preco_competidores.sql
-│   ├── silver/              # 🥈 Dados limpos
+│   ├── silver/              # 📋 PASSO 4: 🥈 Dados limpos
 │   │   ├── silver_produtos.sql
 │   │   ├── silver_clientes.sql
 │   │   ├── silver_vendas.sql
 │   │   ├── silver_preco_competidores.sql
 │   │   └── silver_vendas_enriquecidas.sql
-│   └── gold/                # 🥇 KPIs e métricas (Data Marts)
+│   └── gold/                # 📋 PASSO 5: 🥇 KPIs e métricas (Data Marts)
 │       ├── sales/           # 📊 Data Mart: Vendas & Receita
 │       │   ├── gold_kpi_produtos_top_receita.sql
 │       │   ├── gold_kpi_produtos_top_quantidade.sql
@@ -523,8 +654,7 @@ aula-03-dbt/
 │           ├── gold_kpi_precos_competitividade.sql
 │           └── gold_kpi_produtos_criticos_preco.sql
 ├── macros/                   # Macros reutilizáveis
-├── tests/                    # Testes de qualidade
-└── _sources.yml             # Definição de fontes de dados
+└── tests/                    # Testes de qualidade
 ```
 
 ---
@@ -602,6 +732,410 @@ Este projeto recria os principais KPIs da **Aula 01 (SQL)** usando dbt e arquite
 
 ---
 
+## 🏗️ Construindo o Projeto Passo a Passo
+
+Vamos construir a camada analítica seguindo a ordem correta. Esta é a sequência que você deve seguir:
+
+### 📋 Passo 1: Configurar o Projeto (dbt_project.yml)
+
+O arquivo `dbt_project.yml` é o **coração do projeto dbt**. Ele define como o dbt vai se comportar.
+
+**Localização:** `aula-03-dbt/dbt_project.yml`
+
+**O que ele faz:**
+- Define o nome do projeto
+- Configura onde estão os modelos, macros, testes
+- Define materializações padrão por camada (bronze=view, silver=table, gold=table)
+- Define schemas por camada (bronze, silver, gold)
+- Define variáveis do projeto (thresholds, top N, etc.)
+
+**Estrutura básica:**
+```yaml
+name: 'jornada_de_dados'
+version: '1.0.0'
+
+# Configurações de modelos por camada
+models:
+  jornada_de_dados:
+    bronze:
+      +materialized: view      # Bronze = view (sempre atualizado)
+      +schema: bronze
+      +tags: ["bronze", "raw"]
+    
+    silver:
+      +materialized: table     # Silver = table (performance)
+      +schema: silver
+      +tags: ["silver", "cleaned"]
+    
+    gold:
+      +materialized: table     # Gold = table (KPIs prontos)
+      +schema: gold
+      +tags: ["gold", "kpi"]
+
+# Variáveis do projeto
+vars:
+  segmentacao_vip_threshold: 10000
+  top_n_produtos: 10
+```
+
+**Por que começar aqui?**
+- Define a estrutura do projeto
+- Configurações aplicadas a todos os modelos
+- Variáveis disponíveis em todos os modelos
+
+---
+
+### 📋 Passo 2: Definir Fontes de Dados (_sources.yml)
+
+O arquivo `_sources.yml` **documenta as tabelas raw** (fonte original dos dados).
+
+**Localização:** `aula-03-dbt/models/_sources.yml`
+
+**O que ele faz:**
+- Define de onde vêm os dados (tabelas raw)
+- Documenta colunas e tipos
+- Permite usar `{{ source('raw', 'produtos') }}` nos modelos
+- Habilita testes nas fontes
+
+**Estrutura:**
+```yaml
+version: 2
+
+sources:
+  - name: raw
+    description: "Tabelas brutas do banco de dados"
+    schema: public
+    tables:
+      - name: produtos
+        description: "Tabela de produtos cadastrados"
+        columns:
+          - name: id_produto
+            description: "ID único do produto"
+          - name: nome_produto
+            description: "Nome do produto"
+      # ... outras tabelas
+```
+
+**Por que definir fontes?**
+- Documentação automática
+- Testes de qualidade nas fontes
+- Alerta quando fonte muda
+- Rastreabilidade completa
+
+**Como usar:**
+```sql
+-- Em bronze_produtos.sql
+SELECT * FROM {{ source('raw', 'produtos') }}
+```
+
+---
+
+### 📋 Passo 3: Criar Camada Bronze
+
+A camada Bronze é onde você **congela o formato dos dados** vindos das fontes raw.
+
+**Localização:** `aula-03-dbt/models/bronze/`
+
+**Modelos a criar:**
+1. `bronze_produtos.sql`
+2. `bronze_clientes.sql`
+3. `bronze_vendas.sql`
+4. `bronze_preco_competidores.sql`
+
+**O que fazer no Bronze:**
+- ✅ Selecionar colunas explícitas (não usar `SELECT *`)
+- ✅ Padronizar nomes de colunas
+- ✅ Forçar tipos (CAST quando necessário)
+- ✅ Manter dados exatamente como vêm (mínima transformação)
+
+**Exemplo:**
+```sql
+{{
+    config(
+        materialized='view',
+        schema='bronze',
+        tags=['bronze', 'raw', 'produtos']
+    )
+}}
+
+SELECT
+    id_produto,
+    nome_produto,
+    categoria,
+    marca,
+    preco_atual,
+    data_criacao
+FROM {{ source('raw', 'produtos') }}
+```
+
+**Por que Bronze primeiro?**
+- Cria o contrato mínimo do dado
+- Isola mudanças do upstream
+- Permite testes básicos
+- Base para todas as outras camadas
+
+**Executar:**
+```bash
+dbt run --select tag:bronze
+```
+
+---
+
+### 📋 Passo 4: Criar Camada Silver
+
+A camada Silver é onde você **limpa, padroniza e enriquece** os dados.
+
+**Localização:** `aula-03-dbt/models/silver/`
+
+**Modelos a criar:**
+1. `silver_produtos.sql` - Limpa produtos
+2. `silver_clientes.sql` - Limpa clientes
+3. `silver_vendas.sql` - Limpa e enriquece vendas
+4. `silver_preco_competidores.sql` - Limpa preços
+5. `silver_vendas_enriquecidas.sql` - JOIN vendas + produtos + clientes
+
+**O que fazer no Silver:**
+- ✅ Limpar dados (TRIM, UPPER, etc.)
+- ✅ Tratar nulos (COALESCE)
+- ✅ Validar dados (flags de qualidade)
+- ✅ Enriquecer (colunas calculadas, dimensões temporais)
+- ✅ JOIN com outras tabelas
+
+**Exemplo - silver_produtos.sql:**
+```sql
+{{
+    config(
+        materialized='table',
+        schema='silver',
+        tags=['silver', 'cleaned', 'produtos']
+    )
+}}
+
+SELECT
+    id_produto,
+    UPPER(TRIM(nome_produto)) AS nome_produto,
+    UPPER(TRIM(categoria)) AS categoria,
+    UPPER(TRIM(marca)) AS marca,
+    preco_atual,
+    data_criacao,
+    -- Colunas calculadas
+    CASE 
+        WHEN preco_atual > 1000 THEN 'PREMIUM'
+        WHEN preco_atual > 500 THEN 'MEDIO'
+        ELSE 'BASICO'
+    END AS faixa_preco,
+    -- Validações
+    CASE 
+        WHEN preco_atual < 0 THEN TRUE
+        ELSE FALSE
+    END AS flag_preco_invalido
+FROM {{ ref('bronze_produtos') }}
+WHERE nome_produto IS NOT NULL
+  AND categoria IS NOT NULL
+```
+
+**Exemplo - silver_vendas_enriquecidas.sql:**
+```sql
+{{
+    config(
+        materialized='table',
+        schema='silver',
+        tags=['silver', 'enriched', 'vendas']
+    )
+}}
+
+SELECT
+    v.id_venda AS venda_id,
+    v.id_cliente,
+    v.id_produto,
+    v.quantidade,
+    v.preco_unitario,
+    v.receita_total,
+    v.data_venda,
+    v.data_venda_date,
+    v.canal_venda,
+    -- Dados do produto
+    p.nome_produto,
+    p.categoria,
+    p.marca,
+    -- Dados do cliente
+    c.nome_cliente,
+    c.estado
+FROM {{ ref('silver_vendas') }} v
+LEFT JOIN {{ ref('silver_produtos') }} p
+    ON v.id_produto = p.id_produto
+LEFT JOIN {{ ref('silver_clientes') }} c
+    ON v.id_cliente = c.id_cliente
+WHERE v.flag_quantidade_invalida = FALSE
+  AND v.flag_preco_invalido = FALSE
+```
+
+**Por que Silver depois do Bronze?**
+- Depende do Bronze estar pronto
+- Aplica regras de negócio básicas
+- Prepara dados para análise
+- Base para a camada Gold
+
+**Executar:**
+```bash
+# Executar todos os modelos Silver
+dbt run --select tag:silver
+
+# Executar modelo específico
+dbt run --select silver_vendas_enriquecidas
+```
+
+---
+
+### 📋 Passo 5: Criar Camada Gold (Data Marts)
+
+A camada Gold é onde você cria **KPIs e métricas de negócio**, organizados em Data Marts.
+
+**Localização:** `aula-03-dbt/models/gold/`
+
+**Estrutura de Data Marts:**
+```
+gold/
+├── sales/              # 📊 Vendas & Receita
+├── customer_success/   # 👥 Clientes
+└── pricing/            # 💰 Preços & Competitividade
+```
+
+**Modelos a criar:**
+
+#### 📊 Data Mart: Sales (6 modelos)
+1. `gold_kpi_produtos_top_receita.sql`
+2. `gold_kpi_produtos_top_quantidade.sql`
+3. `gold_kpi_receita_por_categoria.sql`
+4. `gold_kpi_receita_por_canal.sql`
+5. `gold_kpi_receita_por_marca.sql`
+6. `gold_kpi_vendas_temporais.sql`
+
+#### 👥 Data Mart: Customer Success (2 modelos)
+7. `gold_kpi_clientes_segmentacao.sql`
+8. `gold_kpi_clientes_top.sql`
+
+#### 💰 Data Mart: Pricing (2 modelos)
+9. `gold_kpi_precos_competitividade.sql`
+10. `gold_kpi_produtos_criticos_preco.sql`
+
+**O que fazer no Gold:**
+- ✅ Agregações complexas (SUM, COUNT, AVG)
+- ✅ Rankings (ROW_NUMBER, RANK)
+- ✅ Segmentações (CASE WHEN)
+- ✅ Percentuais e comparações
+- ✅ Dados prontos para dashboards
+
+**Exemplo - gold_kpi_produtos_top_receita.sql:**
+```sql
+{{
+    config(
+        materialized='table',
+        schema='gold',
+        tags=['gold', 'kpi', 'produtos', 'receita']
+    )
+}}
+
+WITH vendas_por_produto AS (
+    SELECT
+        id_produto,
+        nome_produto,
+        categoria,
+        marca,
+        SUM(receita_total) AS receita_total,
+        SUM(quantidade) AS quantidade_total,
+        COUNT(DISTINCT venda_id) AS total_vendas,
+        AVG(preco_unitario) AS preco_medio_vendido,
+        AVG(receita_total) AS ticket_medio
+    FROM {{ ref('silver_vendas_enriquecidas') }}
+    GROUP BY 1, 2, 3, 4
+)
+
+SELECT
+    id_produto AS produto_id,
+    nome_produto,
+    categoria,
+    marca,
+    receita_total,
+    quantidade_total,
+    total_vendas,
+    preco_medio_vendido,
+    ticket_medio,
+    -- Ranking
+    ROW_NUMBER() OVER (ORDER BY receita_total DESC) AS ranking_receita,
+    ROW_NUMBER() OVER (PARTITION BY categoria ORDER BY receita_total DESC) AS ranking_receita_categoria
+FROM vendas_por_produto
+ORDER BY receita_total DESC
+LIMIT {{ var('top_n_produtos', 10) }}
+```
+
+**Exemplo - gold_kpi_clientes_segmentacao.sql:**
+```sql
+{{
+    config(
+        materialized='table',
+        schema='gold',
+        tags=['gold', 'kpi', 'clientes', 'segmentacao']
+    )
+}}
+
+WITH receita_por_cliente AS (
+    SELECT
+        id_cliente,
+        nome_cliente,
+        estado,
+        SUM(receita_total) AS receita_total,
+        COUNT(DISTINCT venda_id) AS total_compras,
+        AVG(receita_total) AS ticket_medio,
+        MIN(data_venda_date) AS primeira_compra,
+        MAX(data_venda_date) AS ultima_compra
+    FROM {{ ref('silver_vendas_enriquecidas') }}
+    GROUP BY 1, 2, 3
+)
+
+SELECT
+    id_cliente AS cliente_id,
+    nome_cliente,
+    estado,
+    receita_total,
+    total_compras,
+    ticket_medio,
+    primeira_compra,
+    ultima_compra,
+    -- Segmentação usando CASE WHEN
+    CASE 
+        WHEN receita_total >= {{ var('segmentacao_vip_threshold', 10000) }} THEN 'VIP'
+        WHEN receita_total >= {{ var('segmentacao_top_tier_threshold', 5000) }} THEN 'TOP_TIER'
+        ELSE 'REGULAR'
+    END AS segmento_cliente,
+    -- Ranking
+    ROW_NUMBER() OVER (ORDER BY receita_total DESC) AS ranking_receita
+FROM receita_por_cliente
+ORDER BY receita_total DESC
+```
+
+**Por que Gold por último?**
+- Depende do Silver estar completo
+- Cria métricas de negócio
+- Organiza por área (Data Marts)
+- Pronto para consumo (dashboards, BI)
+
+**Executar:**
+```bash
+# Executar todos os KPIs
+dbt run --select tag:gold
+
+# Executar data mart específico
+dbt run --select sales.*
+dbt run --select customer_success.*
+dbt run --select pricing.*
+
+# Executar KPI específico
+dbt run --select gold_kpi_produtos_top_receita
+```
+
+---
+
 ## 🚀 Como Usar
 
 ### 1. Instalar dbt
@@ -630,7 +1164,7 @@ jornada_de_dados:
       threads: 4
 ```
 
-### 3. Executar Modelos
+### 3. Executar Modelos na Ordem
 
 ```bash
 # Navegar para o diretório do projeto
@@ -639,19 +1173,29 @@ cd aulas/aula-03-dbt
 # Testar conexão
 dbt debug
 
-# Executar todos os modelos
-dbt run
+# ============================================
+# ORDEM DE EXECUÇÃO (seguir esta sequência)
+# ============================================
 
-# Executar apenas camada Bronze
+# 1. Executar camada Bronze primeiro
 dbt run --select tag:bronze
 
-# Executar apenas camada Silver
+# 2. Executar camada Silver (depende do Bronze)
 dbt run --select tag:silver
 
-# Executar apenas camada Gold
+# 3. Executar camada Gold (depende do Silver)
 dbt run --select tag:gold
 
+# OU executar tudo de uma vez (dbt resolve dependências)
+dbt run
+
+# ============================================
+# EXECUÇÕES ESPECÍFICAS
+# ============================================
+
 # Executar modelo específico
+dbt run --select bronze_produtos
+dbt run --select silver_vendas_enriquecidas
 dbt run --select gold_kpi_produtos_top_receita
 
 # Executar data mart específico
@@ -659,7 +1203,7 @@ dbt run --select sales.*
 dbt run --select customer_success.*
 dbt run --select pricing.*
 
-# Executar com dependências
+# Executar com dependências (executa o modelo + todos que ele depende)
 dbt run --select gold_kpi_produtos_top_receita+
 ```
 
@@ -886,18 +1430,27 @@ LIMIT {{ var('top_n_produtos', 10) }}
 
 ## 🎓 Progressão de Aprendizado
 
-### 1. **Camada Bronze** (Dados Brutos)
-- Entender o conceito de dados brutos
-- Criar modelos que copiam dados da fonte
-- Usar `{{ source() }}` para referenciar fontes
+Siga esta ordem para construir o projeto:
 
-### 2. **Camada Silver** (Dados Limpos)
+### 1. **Configuração** (dbt_project.yml + _sources.yml)
+- Configurar o projeto dbt
+- Definir fontes de dados
+- Entender configurações por camada
+
+### 2. **Camada Bronze** (Dados Brutos)
+- Entender o conceito de dados brutos
+- Criar modelos que padronizam dados da fonte
+- Usar `{{ source() }}` para referenciar fontes
+- Criar o contrato mínimo do dado
+
+### 3. **Camada Silver** (Dados Limpos)
 - Limpar e padronizar dados
 - Aplicar validações
 - Enriquecer dados com colunas calculadas
+- Fazer JOINs entre tabelas
 - Usar `{{ ref() }}` para referenciar Bronze
 
-### 3. **Camada Gold** (KPIs e Data Marts)
+### 4. **Camada Gold** (KPIs e Data Marts)
 - Criar métricas de negócio
 - Organizar KPIs em Data Marts (áreas de negócio)
 - Fazer agregações complexas
