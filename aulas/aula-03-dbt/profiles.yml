@@ -1,0 +1,20 @@
+# Arquivo de perfil dbt
+# IMPORTANTE: Este arquivo normalmente fica em ~/.dbt/profiles.yml
+# Mas incluímos aqui como referência
+
+jornada_de_dados:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: aws-0-us-west-2.pooler.supabase.com
+      user: postgres.zsutlhnykwxackvunyvr
+      password: "24f38596737f3de9352bdfbb86b2493f"
+      port: 5432
+      dbname: postgres
+      schema: public
+      threads: 4
+      keepalives_idle: 0
+      connect_timeout: 10
+      search_path: "public"
+

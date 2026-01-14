@@ -1,0 +1,75 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Tabelas brutas do banco de dados (fonte original)"
+    schema: public
+    tables:
+      - name: produtos
+        description: "Tabela de produtos cadastrados"
+        columns:
+          - name: id
+            description: "ID único do produto"
+          - name: nome_produto
+            description: "Nome do produto"
+          - name: categoria
+            description: "Categoria do produto"
+          - name: marca
+            description: "Marca do produto"
+          - name: preco_atual
+            description: "Preço atual do produto"
+          - name: estoque_atual
+            description: "Quantidade em estoque"
+          - name: data_cadastro
+            description: "Data de cadastro do produto"
+      
+      - name: clientes
+        description: "Tabela de clientes cadastrados"
+        columns:
+          - name: id
+            description: "ID único do cliente"
+          - name: nome_cliente
+            description: "Nome do cliente"
+          - name: email
+            description: "Email do cliente"
+          - name: telefone
+            description: "Telefone do cliente"
+          - name: cidade
+            description: "Cidade do cliente"
+          - name: estado
+            description: "Estado do cliente"
+          - name: data_cadastro
+            description: "Data de cadastro do cliente"
+      
+      - name: vendas
+        description: "Tabela de vendas realizadas"
+        columns:
+          - name: id
+            description: "ID único da venda"
+          - name: cliente_id
+            description: "ID do cliente"
+          - name: produto_id
+            description: "ID do produto"
+          - name: quantidade
+            description: "Quantidade vendida"
+          - name: preco_unitario
+            description: "Preço unitário da venda"
+          - name: data_venda
+            description: "Data e hora da venda"
+          - name: canal_venda
+            description: "Canal de venda (ecommerce, loja_fisica)"
+      
+      - name: preco_competidores
+        description: "Tabela de preços coletados de concorrentes"
+        columns:
+          - name: id
+            description: "ID único do registro"
+          - name: produto_id
+            description: "ID do produto"
+          - name: nome_concorrente
+            description: "Nome do concorrente"
+          - name: preco_concorrente
+            description: "Preço do concorrente"
+          - name: data_coleta
+            description: "Data de coleta do preço"
+

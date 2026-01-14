@@ -1,0 +1,49 @@
+name: 'jornada_de_dados'
+version: '1.0.0'
+config-version: 2
+
+# Configuração do perfil de conexão
+profile: 'jornada_de_dados'
+
+# Configurações do projeto
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Configurações de modelos por camada
+models:
+  jornada_de_dados:
+    # Camada Bronze - Dados brutos
+    bronze:
+      +materialized: view
+      +schema: bronze
+      +tags: ["bronze", "raw"]
+    
+    # Camada Silver - Dados limpos e transformados
+    silver:
+      +materialized: table
+      +schema: silver
+      +tags: ["silver", "cleaned"]
+    
+    # Camada Gold - KPIs e métricas de negócio
+    gold:
+      +materialized: table
+      +schema: gold
+      +tags: ["gold", "kpi", "metrics"]
+
+# Variáveis do projeto
+vars:
+  # Configurações de negócio
+  segmentacao_vip_threshold: 10000  # Receita mínima para cliente VIP
+  segmentacao_top_tier_threshold: 5000  # Receita mínima para TOP_TIER
+  top_n_produtos: 10  # Quantidade de produtos no top N
+  top_n_clientes: 10  # Quantidade de clientes no top N
+

@@ -1,0 +1,11 @@
+# Dependências para Aula 03: dbt & Camada Analítica
+
+# dbt core
+dbt-core>=1.7.0
+
+# Adaptador PostgreSQL
+dbt-postgres>=1.7.0
+
+# Utilitários
+python-dotenv>=1.0.0
+
