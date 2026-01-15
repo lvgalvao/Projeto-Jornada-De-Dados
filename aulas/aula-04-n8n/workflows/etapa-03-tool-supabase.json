@@ -1,0 +1,134 @@
+{
+  "name": "Etapa 3: Tool + Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credentials",
+          "name": "Telegram Bot Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "agent": "openAi",
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "Você é um assistente de dados que ajuda usuários a consultar informações do banco de dados.\nVocê tem acesso a uma Tool PostgreSQL que permite consultar tabelas no schema 'gold'.\nQuando o usuário perguntar sobre produtos, clientes, vendas ou receita, use a Tool PostgreSQL para buscar os dados reais.\nSempre formate as respostas de forma clara e amigável, usando emojis quando apropriado.\nSe o usuário perguntar algo que não possa ser respondido com dados do banco, responda educadamente que só pode ajudar com consultas de dados.",
+          "tools": {
+            "values": [
+              {
+                "tool": "postgres",
+                "schema": "gold",
+                "tables": [
+                  "gold_kpi_produtos_top_receita",
+                  "gold_kpi_produtos_top_quantidade",
+                  "gold_kpi_clientes_top",
+                  "gold_kpi_clientes_segmentacao",
+                  "gold_kpi_receita_por_categoria",
+                  "gold_kpi_receita_por_canal",
+                  "gold_kpi_receita_por_marca",
+                  "gold_kpi_vendas_temporais",
+                  "gold_kpi_precos_competitividade",
+                  "gold_kpi_produtos_criticos_preco"
+                ]
+              }
+            ]
+          },
+          "memory": {
+            "type": "bufferWindow",
+            "windowSize": 10
+          },
+          "sessionId": "={{ $json.message.chat.id.toString() }}"
+        }
+      },
+      "id": "ai-agent",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.3,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-credentials",
+          "name": "OpenAI API"
+        },
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "parseMode": "Markdown"
+      },
+      "id": "telegram-send",
+      "name": "Telegram Send",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        680,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credentials",
+          "name": "Telegram Bot Jornada"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

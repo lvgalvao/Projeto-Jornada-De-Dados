@@ -1,0 +1,606 @@
+{
+  "name": "Query Supabase via Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credentials",
+          "name": "Telegram Bot Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "extract-command",
+              "name": "command",
+              "value": "={{ $json.message.text.split(' ')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "extract-chat-id",
+              "name": "chatId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "extract-user-name",
+              "name": "userName",
+              "value": "={{ $json.message.from.first_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "extract-data",
+      "name": "Extract Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "command-start",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "start"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "command-help",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "/help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "help"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "command-top-produtos",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "/top_produtos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "top_produtos"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "command-top-clientes",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "/top_clientes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "top_clientes"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "command-receita-categoria",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "/receita_categoria",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "receita_categoria"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "command-receita-canal",
+                    "leftValue": "={{ $json.command }}",
+                    "rightValue": "/receita_canal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "receita_canal"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "default"
+        }
+      },
+      "id": "route-command",
+      "name": "Route Command",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    nome_produto,\n    receita_total,\n    quantidade_total,\n    ranking_receita\nFROM gold.gold_kpi_produtos_top_receita\nORDER BY receita_total DESC\nLIMIT 10"
+      },
+      "id": "query-top-produtos",
+      "name": "Query Top Produtos",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        900,
+        180
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    nome_cliente,\n    receita_total,\n    total_compras,\n    segmento_cliente\nFROM gold.gold_kpi_clientes_top\nORDER BY receita_total DESC\nLIMIT 10"
+      },
+      "id": "query-top-clientes",
+      "name": "Query Top Clientes",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        900,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    categoria,\n    receita_total,\n    percentual_receita,\n    quantidade_produtos\nFROM gold.gold_kpi_receita_por_categoria\nORDER BY receita_total DESC"
+      },
+      "id": "query-receita-categoria",
+      "name": "Query Receita Categoria",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        900,
+        420
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    canal_venda,\n    receita_total,\n    percentual_receita,\n    total_vendas\nFROM gold.gold_kpi_receita_por_canal\nORDER BY receita_total DESC"
+      },
+      "id": "query-receita-canal",
+      "name": "Query Receita Canal",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        900,
+        540
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatar resultado de produtos\nconst items = $input.all();\nlet message = '🏆 *Top 10 Produtos por Receita*\\n\\n';\n\nitems.forEach((item, index) => {\n  const produto = item.json;\n  const receita = new Intl.NumberFormat('pt-BR', {\n    style: 'currency',\n    currency: 'BRL'\n  }).format(produto.receita_total);\n  \n  message += `${index + 1}. ${produto.nome_produto}\\n`;\n  message += `   💰 Receita: ${receita}\\n`;\n  message += `   📦 Quantidade: ${produto.quantidade_total}\\n\\n`;\n});\n\nreturn {\n  json: {\n    message: message\n  }\n};"
+      },
+      "id": "format-top-produtos",
+      "name": "Format Top Produtos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatar resultado de clientes\nconst items = $input.all();\nlet message = '👥 *Top 10 Clientes por Receita*\\n\\n';\n\nitems.forEach((item, index) => {\n  const cliente = item.json;\n  const receita = new Intl.NumberFormat('pt-BR', {\n    style: 'currency',\n    currency: 'BRL'\n  }).format(cliente.receita_total);\n  \n  message += `${index + 1}. ${cliente.nome_cliente}\\n`;\n  message += `   💰 Receita: ${receita}\\n`;\n  message += `   🛒 Compras: ${cliente.total_compras}\\n`;\n  message += `   ⭐ Segmento: ${cliente.segmento_cliente}\\n\\n`;\n});\n\nreturn {\n  json: {\n    message: message\n  }\n};"
+      },
+      "id": "format-top-clientes",
+      "name": "Format Top Clientes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatar resultado de receita por categoria\nconst items = $input.all();\nlet message = '📊 *Receita por Categoria*\\n\\n';\n\nitems.forEach((item) => {\n  const categoria = item.json;\n  const receita = new Intl.NumberFormat('pt-BR', {\n    style: 'currency',\n    currency: 'BRL'\n  }).format(categoria.receita_total);\n  \n  message += `📦 ${categoria.categoria}\\n`;\n  message += `   💰 Receita: ${receita}\\n`;\n  message += `   📈 Percentual: ${categoria.percentual_receita.toFixed(2)}%\\n`;\n  message += `   🔢 Produtos: ${categoria.quantidade_produtos}\\n\\n`;\n});\n\nreturn {\n  json: {\n    message: message\n  }\n};"
+      },
+      "id": "format-receita-categoria",
+      "name": "Format Receita Categoria",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatar resultado de receita por canal\nconst items = $input.all();\nlet message = '📱 *Receita por Canal de Venda*\\n\\n';\n\nitems.forEach((item) => {\n  const canal = item.json;\n  const receita = new Intl.NumberFormat('pt-BR', {\n    style: 'currency',\n    currency: 'BRL'\n  }).format(canal.receita_total);\n  \n  message += `📱 ${canal.canal_venda}\\n`;\n  message += `   💰 Receita: ${receita}\\n`;\n  message += `   📈 Percentual: ${canal.percentual_receita.toFixed(2)}%\\n`;\n  message += `   🛒 Vendas: ${canal.total_vendas}\\n\\n`;\n});\n\nreturn {\n  json: {\n    message: message\n  }\n};"
+      },
+      "id": "format-receita-canal",
+      "name": "Format Receita Canal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extract Data').item.json.chatId }}",
+        "text": "👋 Olá! Bem-vindo ao *Jornada de Dados Bot*\\n\\nEste bot permite consultar dados do banco Supabase usando comandos simples.\\n\\nUse /help para ver todos os comandos disponíveis."
+      },
+      "id": "send-start-message",
+      "name": "Send Start Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        60
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credentials",
+          "name": "Telegram Bot Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extract Data').item.json.chatId }}",
+        "text": "📚 *Comandos Disponíveis*\\n\\n/start - Mensagem de boas-vindas\\n/help - Ver esta lista de comandos\\n/top_produtos - Top 10 produtos por receita\\n/top_clientes - Top 10 clientes por receita\\n/receita_categoria - Receita por categoria\\n/receita_canal - Receita por canal de venda"
+      },
+      "id": "send-help-message",
+      "name": "Send Help Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        120
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credentials",
+          "name": "Telegram Bot Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extract Data').item.json.chatId }}",
+        "text": "={{ $json.message }}",
+        "parseMode": "Markdown"
+      },
+      "id": "send-response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1340,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credentials",
+          "name": "Telegram Bot Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extract Data').item.json.chatId }}",
+        "text": "❌ Comando não reconhecido. Use /help para ver os comandos disponíveis."
+      },
+      "id": "send-error-message",
+      "name": "Send Error Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        660
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credentials",
+          "name": "Telegram Bot Jornada"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Data": {
+      "main": [
+        [
+          {
+            "node": "Route Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Command": {
+      "main": [
+        [
+          {
+            "node": "Send Start Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Help Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Query Top Produtos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Query Top Clientes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Query Receita Categoria",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Query Receita Canal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Top Produtos": {
+      "main": [
+        [
+          {
+            "node": "Format Top Produtos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Top Clientes": {
+      "main": [
+        [
+          {
+            "node": "Format Top Clientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Receita Categoria": {
+      "main": [
+        [
+          {
+            "node": "Format Receita Categoria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Receita Canal": {
+      "main": [
+        [
+          {
+            "node": "Format Receita Canal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Top Produtos": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Top Clientes": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Receita Categoria": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Receita Canal": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

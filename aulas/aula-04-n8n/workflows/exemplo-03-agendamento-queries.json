@@ -1,0 +1,124 @@
+{
+  "name": "Agendamento de Queries",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    DATE(data_venda_date) as data,\n    COUNT(*) as total_vendas,\n    SUM(receita_total) as receita_total,\n    AVG(receita_total) as ticket_medio\nFROM silver.silver_vendas_enriquecidas\nWHERE data_venda_date >= CURRENT_DATE - INTERVAL '1 day'\nGROUP BY DATE(data_venda_date)\nORDER BY data DESC;"
+      },
+      "id": "query-relatorio-diario",
+      "name": "Query Relatório Diário",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Formatar relatório diário\nconst items = $input.all();\nlet message = '📊 *Relatório Diário de Vendas*\\n\\n';\n\nif (items.length === 0) {\n  message += 'Nenhuma venda registrada hoje.\\n';\n} else {\n  items.forEach((item) => {\n    const relatorio = item.json;\n    const receita = new Intl.NumberFormat('pt-BR', {\n      style: 'currency',\n      currency: 'BRL'\n    }).format(relatorio.receita_total);\n    \n    const ticket = new Intl.NumberFormat('pt-BR', {\n      style: 'currency',\n      currency: 'BRL'\n    }).format(relatorio.ticket_medio);\n    \n    message += `📅 Data: ${relatorio.data}\\n`;\n    message += `🛒 Total de Vendas: ${relatorio.total_vendas}\\n`;\n    message += `💰 Receita Total: ${receita}\\n`;\n    message += `💵 Ticket Médio: ${ticket}\\n\\n`;\n  });\n}\n\nmessage += '\\n_Relatório gerado automaticamente pelo n8n_';\n\nreturn {\n  json: {\n    message: message,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "format-relatorio",
+      "name": "Format Relatório",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "SEU_CHAT_ID_AQUI",
+        "text": "={{ $json.message }}",
+        "parseMode": "Markdown"
+      },
+      "id": "send-telegram",
+      "name": "Send Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-credentials",
+          "name": "Telegram Bot Jornada"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Query Relatório Diário",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Relatório Diário": {
+      "main": [
+        [
+          {
+            "node": "Format Relatório",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Relatório": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

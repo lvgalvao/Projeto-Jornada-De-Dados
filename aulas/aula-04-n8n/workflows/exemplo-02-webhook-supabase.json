@@ -1,0 +1,161 @@
+{
+  "name": "Webhook + Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "salvar-venda",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "salvar-venda"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "extract-id-produto",
+              "name": "id_produto",
+              "value": "={{ $json.body.id_produto }}",
+              "type": "string"
+            },
+            {
+              "id": "extract-id-cliente",
+              "name": "id_cliente",
+              "value": "={{ $json.body.id_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "extract-quantidade",
+              "name": "quantidade",
+              "value": "={{ $json.body.quantidade }}",
+              "type": "number"
+            },
+            {
+              "id": "extract-preco-unitario",
+              "name": "preco_unitario",
+              "value": "={{ $json.body.preco_unitario }}",
+              "type": "number"
+            },
+            {
+              "id": "calculate-receita",
+              "name": "receita_total",
+              "value": "={{ $json.quantidade * $json.preco_unitario }}",
+              "type": "number"
+            },
+            {
+              "id": "set-data-venda",
+              "name": "data_venda",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "set-canal-venda",
+              "name": "canal_venda",
+              "value": "={{ $json.body.canal_venda || 'ecommerce' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "prepare-data",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO public.vendas (\n    id_venda,\n    data_venda,\n    id_cliente,\n    id_produto,\n    canal_venda,\n    quantidade,\n    preco_unitario\n) VALUES (\n    'vnd_' || substr(md5(random()::text), 1, 10),\n    '{{ $json.data_venda }}'::timestamp,\n    '{{ $json.id_cliente }}',\n    '{{ $json.id_produto }}',\n    '{{ $json.canal_venda }}',\n    {{ $json.quantidade }},\n    {{ $json.preco_unitario }}\n) RETURNING id_venda, receita_total;"
+      },
+      "id": "insert-venda",
+      "name": "Insert Venda",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        680,
+        300
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "supabase-credentials",
+          "name": "Supabase Jornada"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"id_venda\": $json.id_venda, \"receita_total\": $json.receita_total, \"message\": \"Venda salva com sucesso!\" } }}",
+        "options": {}
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Insert Venda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Venda": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+
