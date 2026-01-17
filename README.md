@@ -2,103 +2,478 @@
 
 ## 📋 Sobre o Projeto
 
-Este é o **projeto prático da Imersão Jornada de Dados**, uma experiência completa de 4 dias onde você vai construir um projeto real de dados, do zero à decisão com IA.
+Este é o **projeto prático da Imersão Jornada de Dados**, uma experiência completa de 4 dias onde você vai construir um **sistema completo de dados** para uma empresa de e-commerce, do zero à decisão com IA.
 
 **Em 4 dias, você vai aprender:**
-- **Dia 1:** SQL & Analytics
-- **Dia 2:** Python & Ingestão de Dados
-- **Dia 3:** Engenharia de Dados
-- **Dia 4:** Inteligência Artificial
+
+- **Dia 1:** SQL & Analytics - Entender o negócio com dados
+- **Dia 2:** Python & Ingestão - Coletar e integrar dados externos
+- **Dia 3:** dbt & Camada Analítica - Transformar dados em insights
+- **Dia 4:** n8n & Agentes de IA - Tomar decisões com inteligência artificial
 
 ---
 
-## 🎯 O Projeto
+## 🏢 O Negócio: E-commerce de Produtos Diversificados
 
-Uma empresa de e-commerce está abrindo sua operação digital e precisa usar dados para tomar decisões melhores. Você vai construir um sistema completo de dados que:
+### 📊 Contexto do Negócio
 
-- ✅ Analisa vendas e clientes
-- ✅ Compara preços com o mercado
-- ✅ Gera insights inteligentes
-- ✅ Toma decisões baseadas em dados
+Uma empresa de e-commerce está expandindo sua operação digital e precisa usar dados para tomar decisões estratégicas. O negócio vende produtos em diversas categorias (Eletrônicos, Casa, Cozinha, Tênis, etc.) e compete com grandes players do mercado (Mercado Livre, Amazon, Magalu, Shopee).
 
-**Não é um exercício. É um projeto de mercado.**
+### 🎯 Desafios de Negócio
+
+1. **Análise de Vendas**: Quais produtos vendem mais? Qual canal é mais eficiente?
+2. **Segmentação de Clientes**: Quem são nossos clientes VIP? Como reter clientes?
+3. **Competitividade de Preços**: Estamos competitivos? Quais produtos precisam de ajuste?
+4. **Decisões Estratégicas**: Como usar dados para tomar decisões rápidas e inteligentes?
+
+### 💼 Valor de Negócio
+
+Este projeto demonstra como dados podem:
+
+- ✅ **Aumentar receita** - Identificando produtos top sellers e oportunidades
+- ✅ **Reduzir custos** - Otimizando preços e canais de venda
+- ✅ **Melhorar experiência** - Segmentando clientes e personalizando ofertas
+- ✅ **Tomar decisões rápidas** - Usando IA para consultar dados em linguagem natural
+
+---
+
+## 🏗️ Arquitetura Completa do Projeto
+
+### 📊 Visão Geral da Arquitetura
+
+```mermaid
+graph TB
+    subgraph Fontes["🌐 Fontes de Dados"]
+        DL["📁 Data Lake<br/>S3/Supabase Storage"]
+        API["📡 APIs Externas<br/>Bitcoin, etc"]
+        SYS["🗄️ Sistemas Transacionais<br/>ERP, CRM"]
+    end
+    
+    subgraph Python["🐍 DIA 2: Python & Ingestão"]
+        B3["☁️ boto3<br/>Data Lake"]
+        REQ["🌐 requests<br/>APIs REST"]
+        PD["🐼 pandas<br/>Processamento"]
+        SA["🗄️ SQLAlchemy<br/>Salvar no DW"]
+    end
+    
+    subgraph DW["🗄️ Data Warehouse<br/>PostgreSQL/Supabase"]
+        BRZ["📦 Bronze<br/>produtos, clientes<br/>vendas, preco_competidores"]
+    end
+    
+    subgraph DBT["🏗️ DIA 3: dbt & Camada Analítica"]
+        BR["🥉 BRONZE<br/>Dados brutos"]
+        SL["🥈 SILVER<br/>Dados limpos"]
+        GD["🥇 GOLD<br/>KPIs de negócio"]
+        SALES["📊 Sales"]
+        CS["👥 Customer Success"]
+        PRC["💰 Pricing"]
+    end
+    
+    subgraph N8N["🤖 DIA 4: n8n & Agentes de IA"]
+        TG["💬 Telegram Bot"]
+        AG["🧠 AI Agent<br/>GPT"]
+        TL["🔧 Tools<br/>PostgreSQL"]
+        MEM["💾 Memória"]
+    end
+    
+    subgraph User["👤 Usuário Final"]
+        Q["❓ Pergunta em<br/>Linguagem Natural"]
+        R["✅ Resposta<br/>Formatada"]
+    end
+    
+    Fontes --> Python
+    Python --> DW
+    DW --> DBT
+    BR --> SL
+    SL --> GD
+    GD --> SALES
+    GD --> CS
+    GD --> PRC
+    SALES --> N8N
+    CS --> N8N
+    PRC --> N8N
+    N8N --> User
+    Q --> TG
+    TG --> AG
+    AG --> TL
+    TL --> GD
+    GD --> AG
+    AG --> MEM
+    AG --> R
+    
+    style Fontes fill:#4A90E2,color:#fff
+    style Python fill:#3776AB,color:#fff
+    style DW fill:#336791,color:#fff
+    style DBT fill:#FF6B6B,color:#fff
+    style BR fill:#CD7F32,color:#fff
+    style SL fill:#C0C0C0,color:#000
+    style GD fill:#FFD700,color:#000
+    style SALES fill:#4A90E2,color:#fff
+    style CS fill:#9B59B6,color:#fff
+    style PRC fill:#E67E22,color:#fff
+    style N8N fill:#9B59B6,color:#fff
+    style User fill:#2ECC71,color:#fff
+```
+
+### 🔄 Fluxo de Dados End-to-End
+
+```mermaid
+flowchart LR
+    E["📥 Extract<br/>Dia 2<br/>Python coleta dados"]
+    L["💾 Load<br/>Dia 2<br/>Salva no DW"]
+    T["🔄 Transform<br/>Dia 3<br/>Bronze → Silver → Gold"]
+    Q["❓ Query<br/>Dia 4<br/>IA consulta Gold"]
+    
+    E -->|boto3, requests| L
+    L -->|PostgreSQL| T
+    T -->|dbt| Q
+    Q -->|Telegram| User["👤 Usuário"]
+    
+    style E fill:#4A90E2,color:#fff
+    style L fill:#50C878,color:#fff
+    style T fill:#FF6B6B,color:#fff
+    style Q fill:#9B59B6,color:#fff
+    style User fill:#2ECC71,color:#fff
+```
 
 ---
 
 ## 📚 As 4 Aulas da Imersão
 
 ### 📊 Dia 1: SQL & Analytics
+
 **Objetivo:** Entender o negócio com SQL
 
-- Descobrir os produtos mais vendidos
-- Identificar os principais clientes
-- Comparar preços com o mercado
-- Criar segmentações de clientes
+**O que você aprende:**
 
-**O que você aprende:** A pensar como analista de dados usando SQL.
+- Fundamentos de SQL (SELECT, WHERE, JOIN, GROUP BY)
+- Análise de vendas, produtos e clientes
+- Comparação de preços com concorrentes
+- Criação de segmentações e classificações
+- 21 exemplos práticos do básico ao avançado
+
+**Perguntas de Negócio Respondidas:**
+
+- Quais são os produtos mais vendidos?
+- Quem são os principais clientes?
+- Estamos competitivos em preços?
+- Quais categorias geram mais receita?
 
 **Material:** [Aula 1 - SQL & Analytics](./aulas/aula-01-sql/)
 
 ---
 
 ### 🐍 Dia 2: Python & Ingestão de Dados
-**Objetivo:** Dados não nascem prontos
 
-- Ler dados de CSVs e combinar múltiplos arquivos
-- Consumir APIs REST para buscar dados externos
-- Fazer web scraping para coletar dados de sites
-- Conectar com bancos de dados (SQLite, PostgreSQL)
-- Tratar e limpar dados inconsistentes
-- Exportar dados para diferentes formatos
+**Objetivo:** Coletar e integrar dados de fontes externas
 
-**O que você aprende:** A pensar como engenheiro de dados usando Python para integrar diferentes fontes de dados.
+**O que você aprende:**
 
-**Entrega do dia:** Scripts Python que coletam, tratam e exportam dados de múltiplas fontes.
+- Conectar com Data Lakes (S3/Supabase Storage) usando boto3
+- Ler arquivos Parquet de Data Lakes
+- Salvar dados processados no PostgreSQL usando pandas
+- Consumir APIs REST (ex: Bitcoin) usando requests
+- Criar pipelines completos: DataLake → Banco, API → Banco
+- Análises básicas com Pandas (head, info, describe, groupby, etc.)
+
+**Perguntas de Negócio Respondidas:**
+
+- Como coletar dados de sistemas externos?
+- Como integrar dados de múltiplas fontes?
+- Como automatizar a ingestão de dados?
 
 **Material:** [Aula 2 - Python & Ingestão](./aulas/aula-02-python/)
 
 ---
 
-### ⚙️ Dia 3: Engenharia de Dados
-**Objetivo:** Transformar scripts em produto
+### 🏗️ Dia 3: dbt & Camada Analítica
 
-- Arquitetura de dados
-- Modelagem analítica
-- Pipelines e orquestração
+**Objetivo:** Transformar dados brutos em insights de negócio
 
-**Frase-chave:** Dados bons precisam escalar.
+**O que você aprende:**
 
-**Material:** [Aula 3 - Engenharia de Dados](./aulas/aula-03-engenharia/) *(em breve)*
+- Arquitetura Medalhão (Bronze, Silver, Gold)
+- ETL vs ELT (evolução histórica)
+- Data Warehouse e modelagem analítica
+- Criar camadas de dados profissionais com dbt
+- Organizar KPIs em Data Marts (Sales, Customer Success, Pricing)
+- Versionamento, testes e documentação de modelos
+
+**Camadas Criadas:**
+
+**🥉 Bronze (Raw):**
+- `bronze_produtos`, `bronze_clientes`, `bronze_vendas`, `bronze_preco_competidores`
+- Dados brutos, sem transformação
+
+**🥈 Silver (Clean):**
+- `silver_produtos`, `silver_clientes`, `silver_vendas`, `silver_preco_competidores`
+- `silver_vendas_enriquecidas` (join de vendas + produtos + clientes)
+- Dados limpos, padronizados e enriquecidos
+
+**🥇 Gold (Business Metrics):**
+
+**📊 Sales (Vendas):**
+- `gold_kpi_produtos_top_receita` - Top produtos por receita
+- `gold_kpi_produtos_top_quantidade` - Top produtos por quantidade
+- `gold_kpi_receita_por_categoria` - Receita por categoria
+- `gold_kpi_receita_por_canal` - Receita por canal (ecommerce/loja física)
+- `gold_kpi_receita_por_marca` - Receita por marca
+- `gold_kpi_vendas_temporais` - Vendas por período (dia, mês, hora)
+
+**👥 Customer Success (Clientes):**
+- `gold_kpi_clientes_top` - Top clientes por receita
+- `gold_kpi_clientes_segmentacao` - Segmentação VIP/TOP_TIER/REGULAR
+
+**💰 Pricing (Preços):**
+- `gold_kpi_precos_competitividade` - Análise de competitividade vs concorrentes
+- `gold_kpi_produtos_criticos_preco` - Produtos críticos por preço
+
+**Perguntas de Negócio Respondidas:**
+
+- Quais produtos geram mais receita?
+- Quem são nossos clientes VIP?
+- Estamos competitivos em preços?
+- Qual canal de venda é mais eficiente?
+
+**Material:** [Aula 3 - dbt & Camada Analítica](./aulas/aula-03-dbt/)
 
 ---
 
-### 🤖 Dia 4: Inteligência Artificial
-**Objetivo:** Dados tomando decisões
+### 🤖 Dia 4: n8n & Agentes de IA
 
-- IA interpretando dados
-- Comparação automática de preços
-- Alertas inteligentes
+**Objetivo:** Criar interface conversacional para consultar dados
 
-**Exemplo:** "Esse produto está mais caro que o mercado."
+**O que você aprende:**
 
-**Material:** [Aula 4 - Inteligência Artificial](./aulas/aula-04-ia/) *(em breve)*
+- Criar Agentes de IA usando n8n
+- Conectar Telegram com banco de dados
+- Configurar System Messages e Guardrails
+- Implementar memória conversacional
+- Usar Tools (PostgreSQL) para consultar dados
+- Criar interface natural para consultar KPIs
+
+**Progressão de Aprendizado:**
+
+**🔥 Esquenta: Hello World**
+- Agente básico que responde perguntas simples
+
+**📋 Etapa 1: Agente de Turismo**
+- Agente especializado com guardrails
+- System Message e limites de comportamento
+
+**📋 Etapa 2: Memória em Agentes**
+- Memória conversacional
+- Agente lembra informações anteriores
+
+**📋 Etapa 3: Tool + Supabase**
+- Agente consulta banco de dados via Tool
+- Responde perguntas sobre KPIs em linguagem natural
+
+**Exemplo de Uso:**
+```
+Usuário: "Quais são os top 5 produtos mais vendidos?"
+Agente: [Consulta gold_kpi_produtos_top_quantidade]
+        "🏆 Top 5 Produtos Mais Vendidos:
+        1. Tênis Nike Air Max - 120 unidades
+        2. Tênis Adidas Ultraboost - 95 unidades
+        ..."
+
+Usuário: "Quanto foi a receita total?"
+Agente: [Consulta gold_kpi_receita_por_categoria]
+        "💰 A receita total foi de R$ 125.000,00"
+```
+
+**Perguntas de Negócio Respondidas:**
+
+- Como tornar dados acessíveis para não-técnicos?
+- Como criar interface conversacional para consultar KPIs?
+- Como usar IA para democratizar acesso a dados?
+
+**Material:** [Aula 4 - n8n & Agentes de IA](./aulas/aula-04-n8n/)
 
 ---
 
-## 🎲 Os 4 Datasets do Projeto
+## 🎯 KPIs e Métricas de Negócio
+
+### 📊 Sales (Vendas)
+
+```mermaid
+graph TB
+    subgraph Sales["📊 Sales - KPIs de Vendas"]
+        KPI1["🏆 Top Produtos por Receita<br/>gold_kpi_produtos_top_receita"]
+        KPI2["📦 Top Produtos por Quantidade<br/>gold_kpi_produtos_top_quantidade"]
+        KPI3["📈 Receita por Categoria<br/>gold_kpi_receita_por_categoria"]
+        KPI4["🛒 Receita por Canal<br/>gold_kpi_receita_por_canal"]
+        KPI5["🏷️ Receita por Marca<br/>gold_kpi_receita_por_marca"]
+        KPI6["📅 Vendas Temporais<br/>gold_kpi_vendas_temporais"]
+    end
+    
+    style Sales fill:#4A90E2,color:#fff
+    style KPI1 fill:#50C878,color:#fff
+    style KPI2 fill:#50C878,color:#fff
+    style KPI3 fill:#50C878,color:#fff
+    style KPI4 fill:#50C878,color:#fff
+    style KPI5 fill:#50C878,color:#fff
+    style KPI6 fill:#50C878,color:#fff
+```
+
+### 👥 Customer Success (Clientes)
+
+```mermaid
+graph TB
+    subgraph CS["👥 Customer Success - KPIs de Clientes"]
+        KPI7["⭐ Top Clientes<br/>gold_kpi_clientes_top"]
+        KPI8["🎯 Segmentação de Clientes<br/>gold_kpi_clientes_segmentacao"]
+    end
+    
+    subgraph Seg["📊 Segmentação"]
+        VIP["👑 VIP<br/>Receita >= R$ 10.000"]
+        TOP["🥇 TOP_TIER<br/>R$ 5.000 - R$ 10.000"]
+        REG["👤 REGULAR<br/>Receita < R$ 5.000"]
+    end
+    
+    KPI8 --> Seg
+    
+    style CS fill:#9B59B6,color:#fff
+    style KPI7 fill:#E74C3C,color:#fff
+    style KPI8 fill:#E74C3C,color:#fff
+    style Seg fill:#F39C12,color:#fff
+    style VIP fill:#FFD700,color:#000
+    style TOP fill:#C0C0C0,color:#000
+    style REG fill:#CD7F32,color:#fff
+```
+
+### 💰 Pricing (Preços)
+
+```mermaid
+graph TB
+    subgraph Pricing["💰 Pricing - KPIs de Preços"]
+        KPI9["⚖️ Competitividade de Preços<br/>gold_kpi_precos_competitividade"]
+        KPI10["⚠️ Produtos Críticos por Preço<br/>gold_kpi_produtos_criticos_preco"]
+    end
+    
+    style Pricing fill:#E67E22,color:#fff
+    style KPI9 fill:#FF6B6B,color:#fff
+    style KPI10 fill:#FF6B6B,color:#fff
+```
+
+---
+
+## 🛠️ Stack Tecnológico
+
+### 📊 Camada de Dados
+
+```mermaid
+graph LR
+    subgraph Dados["📊 Camada de Dados"]
+        PG["🐘 PostgreSQL<br/>Data Warehouse<br/>Dia 1, 2, 3, 4"]
+        SB["⚡ Supabase<br/>PostgreSQL + Extras<br/>Dia 1, 2, 3, 4"]
+        SQL["📝 SQL<br/>Linguagem de Consulta<br/>Dia 1, 3"]
+        DBT["🔧 dbt<br/>Transformação<br/>Dia 3"]
+    end
+    
+    style Dados fill:#3498DB,color:#fff
+    style PG fill:#336791,color:#fff
+    style SB fill:#3ECF8E,color:#fff
+    style SQL fill:#FF6B6B,color:#fff
+    style DBT fill:#FF6B6B,color:#fff
+```
+
+### 🐍 Camada de Ingestão
+
+```mermaid
+graph LR
+    subgraph Ingestao["🐍 Camada de Ingestão"]
+        PY["🐍 Python<br/>Linguagem<br/>Dia 2"]
+        PD["🐼 Pandas<br/>Manipulação<br/>Dia 2"]
+        B3["☁️ boto3<br/>S3/Data Lakes<br/>Dia 2"]
+        REQ["🌐 requests<br/>APIs REST<br/>Dia 2"]
+        SA["🗄️ SQLAlchemy<br/>PostgreSQL<br/>Dia 2"]
+        PA["🏹 PyArrow<br/>Parquet<br/>Dia 2"]
+    end
+    
+    style Ingestao fill:#3776AB,color:#fff
+    style PY fill:#FFD43B,color:#000
+    style PD fill:#150458,color:#fff
+    style B3 fill:#FF9900,color:#fff
+    style REQ fill:#6A6A6A,color:#fff
+    style SA fill:#D71F00,color:#fff
+    style PA fill:#FF6B6B,color:#fff
+```
+
+### 🤖 Camada de IA
+
+```mermaid
+graph LR
+    subgraph IA["🤖 Camada de IA"]
+        N8N["⚡ n8n<br/>Automação<br/>Dia 4"]
+        GPT["🧠 OpenAI GPT<br/>Modelo de Linguagem<br/>Dia 4"]
+        TG["💬 Telegram Bot<br/>Interface<br/>Dia 4"]
+    end
+    
+    style IA fill:#9B59B6,color:#fff
+    style N8N fill:#FF6B6B,color:#fff
+    style GPT fill:#10A37F,color:#fff
+    style TG fill:#0088CC,color:#fff
+```
+
+### ☁️ Infraestrutura
+
+```mermaid
+graph LR
+    subgraph Infra["☁️ Infraestrutura"]
+        S3["☁️ AWS S3 / Supabase Storage<br/>Data Lake<br/>Dia 2"]
+        SUP["⚡ Supabase<br/>PostgreSQL + Data API<br/>Dia 1, 2, 3, 4"]
+    end
+    
+    style Infra fill:#FF6B6B,color:#fff
+    style S3 fill:#FF9900,color:#fff
+    style SUP fill:#3ECF8E,color:#fff
+```
+
+---
+
+## 📊 Estrutura dos Datasets
 
 Este projeto usa **4 datasets sintéticos** gerados com Faker para simular dados reais de e-commerce:
 
-- **`produtos.csv`** - 200 produtos do catálogo
-- **`clientes.csv`** - 50 clientes cadastrados
-- **`vendas.csv`** - ~3.000 vendas (últimos 30 dias)
-- **`preco_competidores.csv`** - ~680 preços de concorrentes
-
-**Características:**
-- Dados realistas (não aleatórios)
-- Distribuições não-normais (como dados reais)
-- Relacionamentos entre tabelas
-- Problemas de integridade para prática (produtos não vendidos, vendas não cadastradas)
+```mermaid
+graph TB
+    subgraph Datasets["📊 Datasets do Projeto"]
+        PROD["📦 produtos.csv<br/>200 produtos<br/>id_produto, nome_produto<br/>categoria, marca, preco_atual"]
+        CLIENT["👥 clientes.csv<br/>50 clientes<br/>id_cliente, nome_cliente<br/>estado, pais"]
+        VENDAS["💰 vendas.csv<br/>~3.000 vendas<br/>id_venda, data_venda<br/>id_cliente, id_produto<br/>canal_venda, quantidade"]
+        PRECO["🏪 preco_competidores.csv<br/>~680 preços<br/>id_produto, nome_concorrente<br/>preco_concorrente, data_coleta"]
+    end
+    
+    subgraph Caracteristicas["✨ Características"]
+        C1["✅ Dados realistas<br/>não aleatórios"]
+        C2["✅ Distribuições<br/>não-normais"]
+        C3["✅ Relacionamentos<br/>entre tabelas"]
+        C4["✅ Problemas de<br/>integridade para prática"]
+    end
+    
+    subgraph Concorrentes["🏪 Concorrentes"]
+        ML["Mercado Livre"]
+        AMZ["Amazon"]
+        MAG["Magalu"]
+        SHOP["Shopee"]
+    end
+    
+    PROD --> VENDAS
+    CLIENT --> VENDAS
+    PROD --> PRECO
+    PRECO --> Concorrentes
+    Datasets --> Caracteristicas
+    
+    style Datasets fill:#4A90E2,color:#fff
+    style PROD fill:#50C878,color:#fff
+    style CLIENT fill:#9B59B6,color:#fff
+    style VENDAS fill:#E74C3C,color:#fff
+    style PRECO fill:#F39C12,color:#fff
+    style Caracteristicas fill:#2ECC71,color:#fff
+    style Concorrentes fill:#E67E22,color:#fff
+```
 
 ---
 
@@ -120,230 +495,35 @@ Os arquivos serão criados na pasta `data/`:
 - `vendas.csv`
 - `preco_competidores.csv`
 
----
+### Passo 2: Configurar Supabase
 
-### Passo 2: Começar a Aula 1
+1. Crie uma conta no [Supabase](https://supabase.com/)
+2. Crie um novo projeto
+3. Importe os CSVs no Supabase SQL Editor:
+   ```sql
+   -- Criar tabelas e importar dados
+   -- Veja instruções detalhadas em: aulas/aula-01-sql/README.md
+   ```
+
+### Passo 3: Começar a Aula 1
 
 Siga as instruções completas em: **[Aula 1 - SQL & Analytics](./aulas/aula-01-sql/README.md)**
 
 **Resumo rápido:**
-1. Importe os CSVs em um banco SQL (SQLite ou PostgreSQL)
+1. Importe os CSVs em Supabase
 2. Execute os 21 exemplos SQL em ordem
 3. Pratique com os exercícios
 4. Responda perguntas de negócio
 
----
+### Passo 4: Continuar com as Aulas
 
-## 📊 Estrutura dos Datasets
-
-### produtos.csv
-```
-id_produto, nome_produto, categoria, marca, preco_atual, data_criacao
-```
-
-**Exemplos de produtos:**
-- Smartphone Galaxy A54
-- Panela de Pressão
-- Tênis Nike Air Max
-- TV LED 50 Polegadas
-
-**Total:** 200 produtos
+- **Dia 2:** [Python & Ingestão de Dados](./aulas/aula-02-python/)
+- **Dia 3:** [dbt & Camada Analítica](./aulas/aula-03-dbt/)
+- **Dia 4:** [n8n & Agentes de IA](./aulas/aula-04-n8n/)
 
 ---
 
-### clientes.csv
-```
-id_cliente, nome_cliente, estado, pais, data_cadastro
-```
-
-**Nota:** A segmentação de clientes (VIP, TOP_TIER, REGULAR) deve ser criada usando CASE WHEN baseado no comportamento de compra (receita total). Isso faz parte do aprendizado do Dia 1!
-
-**Total:** 50 clientes
-
----
-
-### vendas.csv
-```
-id_venda, data_venda, id_cliente, id_produto, canal_venda, quantidade, preco_unitario
-```
-
-**Cálculo importante:**
-- Receita da venda = `quantidade × preco_unitario`
-
-**Total:** ~3.000 vendas (últimos 30 dias)
-
----
-
-### preco_competidores.csv
-```
-id_produto, nome_concorrente, preco_concorrente, data_coleta
-```
-
-**Concorrentes monitorados:**
-- Mercado Livre
-- Amazon
-- Magalu
-- Shopee
-
-**Total:** ~680 registros (1 coleta por produto/concorrente)
-
----
-
-## 🗄️ Esquema das Tabelas Principais
-
-### 📦 produtos (Produtos)
-
-| Coluna | Tipo | Descrição | Exemplo |
-|--------|------|-----------|---------|
-| `id_produto` | TEXT (PK) | ID único do produto | `prd_20d170bd9bf7` |
-| `nome_produto` | TEXT | Nome do produto | `Smartphone Galaxy A54` |
-| `categoria` | TEXT | Categoria do produto | `Eletrônicos`, `Casa`, `Cozinha` |
-| `marca` | TEXT | Marca do produto | `Sony`, `Samsung`, `Apple` |
-| `preco_atual` | REAL | Preço atual (R$) | `73.99` |
-| `data_criacao` | TEXT | Data de criação (ISO) | `2022-03-19 15:57:18` |
-
-**Total de registros:** 200 produtos
-
----
-
-### 👥 clientes (Clientes)
-
-| Coluna | Tipo | Descrição | Exemplo |
-|--------|------|-----------|---------|
-| `id_cliente` | TEXT (PK) | ID único do cliente | `cus_c6a2c1df9a70` |
-| `nome_cliente` | TEXT | Nome completo do cliente | `João Gabriel da Paz` |
-| `estado` | TEXT | Estado (UF) | `SP`, `RJ`, `MG` |
-| `pais` | TEXT | País | `Brasil` |
-| `data_cadastro` | TEXT | Data de cadastro (ISO) | `2024-02-17 10:57:18` |
-
-**Total de registros:** 50 clientes
-
-**Nota:** A segmentação de clientes (VIP, TOP_TIER, REGULAR) deve ser criada usando CASE WHEN baseado no comportamento de compra. Veja o exercício `aulas/aula-01-sql/exercicios/exercicio-case-when-clientes.sql` para aprender como criar essa segmentação.
-
----
-
-### 💰 vendas (Vendas)
-
-| Coluna | Tipo | Descrição | Exemplo |
-|--------|------|-----------|---------|
-| `id_venda` | TEXT (PK) | ID único da venda | `sal_f2414a3f34b6` |
-| `data_venda` | TEXT | Data e hora da venda (ISO) | `2025-12-13 13:15:07` |
-| `id_cliente` | TEXT (FK) | ID do cliente | `cus_63ade3c52c55` |
-| `id_produto` | TEXT (FK) | ID do produto | `prd_91f3a368678f` |
-| `canal_venda` | TEXT | Canal de venda | `ecommerce`, `loja_fisica` |
-| `quantidade` | INTEGER | Quantidade vendida | `1`, `2`, `3` |
-| `preco_unitario` | REAL | Preço unitário da venda (R$) | `116.99` |
-
-**Total de registros:** ~3.000 vendas (últimos 30 dias)
-
-**Relacionamentos:**
-- `id_cliente` → `clientes.id_cliente`
-- `id_produto` → `produtos.id_produto`
-
-**Cálculo importante:**
-- Receita da venda = `quantidade × preco_unitario`
-
----
-
-### 🏪 preco_competidores (Preços de Concorrentes)
-
-| Coluna | Tipo | Descrição | Exemplo |
-|--------|------|-----------|---------|
-| `id_produto` | TEXT (FK) | ID do produto | `prd_20d170bd9bf7` |
-| `nome_concorrente` | TEXT | Nome do concorrente | `Mercado Livre`, `Amazon`, `Magalu`, `Shopee` |
-| `preco_concorrente` | REAL | Preço do concorrente (R$) | `72.51` |
-| `data_coleta` | TEXT | Data da coleta (ISO) | `2026-01-08 14:38:10` |
-
-**Total de registros:** ~680 registros
-
-**Relacionamentos:**
-- `id_produto` → `produtos.id_produto`
-
-**Concorrentes:**
-- Mercado Livre
-- Amazon
-- Magalu
-- Shopee
-
-**Característica especial:**
-- Cada combinação `id_produto + nome_concorrente` é única (1 coleta por produto/concorrente)
-
----
-
-## 🔗 Diagrama de Relacionamentos
-
-```
-┌─────────────┐
-│  clientes   │
-│             │
-│ id_cliente  │◄─────┐
-│    ...      │      │
-└─────────────┘      │
-                     │
-┌─────────────┐      │      ┌─────────────┐
-│  produtos   │      │      │   vendas    │
-│             │      │      │             │
-│ id_produto  │◄─────┼──────┤ id_cliente  │
-│    ...      │      │      │ id_produto  │
-└─────────────┘      │      │    ...      │
-      │              │      └─────────────┘
-      │              │
-      │              │
-      ▼              │
-┌─────────────────┐  │
-│preco_competidores│ │
-│                 │  │
-│   id_produto    │──┘
-│ nome_concorrente│
-│    ...          │
-└─────────────────┘
-```
-
----
-
-## 🎯 Perguntas de Negócio que Vamos Responder
-
-Este projeto foi criado para responder perguntas reais de negócio usando dados. Abaixo estão todas as perguntas que podemos responder:
-
-### 📊 Análise de Produtos
-
-1. **Quais produtos temos no catálogo?**
-2. **Quais são os produtos mais caros?**
-3. **Quais produtos nunca foram vendidos?**
-4. **Quais são os produtos mais vendidos?**
-5. **Qual é a distribuição de produtos por categoria?**
-
-### 💰 Análise de Vendas
-
-6. **Qual é o total de vendas e receita?**
-7. **Qual é a distribuição de receita por canal de venda?**
-8. **Quais são as vendas por período?**
-9. **Quais vendas foram feitas de produtos não cadastrados?**
-
-### 👥 Análise de Clientes
-
-10. **Quem são nossos clientes?** (criar segmentação usando CASE WHEN)
-11. **Quais clientes compram mais?**
-12. **Quais clientes nunca compraram?**
-
-### 🏪 Análise Competitiva
-
-13. **Quais produtos estão mais caros que os concorrentes?**
-14. **Quais produtos estão mais baratos no concorrente?**
-15. **Qual é a diferença percentual entre nossos preços e dos concorrentes?**
-16. **Quais produtos top sellers estão mais caros que todos os concorrentes?**
-
-### 📈 Análises Avançadas
-
-17. **Qual é a receita total por categoria?**
-18. **Quais categorias geram mais de R$ 50.000 em receita?**
-19. **Qual é o ticket médio por segmento de cliente?**
-20. **Quais produtos têm preço acima da média geral?**
-21. **Quais produtos estão mais caros que a média dos concorrentes?**
-
----
-
-## 📚 Estrutura do Projeto
+## 📁 Estrutura do Projeto
 
 ```
 Projeto-Jornada-De-Dados/
@@ -355,121 +535,68 @@ Projeto-Jornada-De-Dados/
 ├── generate_datasets.py          # Gerador de dados sintéticos
 ├── aulas/
 │   ├── aula-01-sql/              # Dia 1: SQL & Analytics
-│   │   ├── queries/               # 21 exemplos SQL
-│   │   ├── exercicios/            # Exercícios práticos
-│   │   ├── README.md             # Guia completo do Dia 1
-│   │   ├── KPIS.md               # KPIs e perguntas de negócio
-│   │   └── ESTRUTURA_DADOS.md    # Documentação dos datasets
-│   ├── aula-02-python/           # Dia 2: Python & Ingestão (em breve)
-│   ├── aula-03-engenharia/       # Dia 3: Engenharia de Dados (em breve)
-│   └── aula-04-ia/               # Dia 4: Inteligência Artificial (em breve)
+│   │   ├── exemplo-01-select-basico.sql
+│   │   ├── exemplo-02-order-by.sql
+│   │   ├── ... (21 exemplos SQL)
+│   │   ├── README.md
+│   │   └── KPIS.md
+│   ├── aula-02-python/           # Dia 2: Python & Ingestão
+│   │   ├── exemplos/
+│   │   │   ├── exemplo-00-aquecimento-fundamentos.py
+│   │   │   ├── exemplo-01-ler-datalake-parquet.py
+│   │   │   ├── exemplo-02-salvar-banco-dados.py
+│   │   │   ├── exemplo-03-projeto-completo.py
+│   │   │   └── exemplo-04-ler-api-bitcoin.py
+│   │   ├── README.md
+│   │   └── requirements.txt
+│   ├── aula-03-dbt/              # Dia 3: dbt & Camada Analítica
+│   │   ├── models/
+│   │   │   ├── bronze/           # Camada Bronze (raw)
+│   │   │   ├── silver/           # Camada Silver (clean)
+│   │   │   └── gold/             # Camada Gold (KPIs)
+│   │   │       ├── sales/        # Data Mart: Vendas
+│   │   │       ├── customer_success/  # Data Mart: Clientes
+│   │   │       └── pricing/      # Data Mart: Preços
+│   │   ├── dbt_project.yml
+│   │   ├── profiles.yml
+│   │   └── README.md
+│   └── aula-04-n8n/              # Dia 4: n8n & Agentes de IA
+│       ├── workflows/
+│       │   ├── esquenta-hello-world.json
+│       │   ├── etapa-01-agente-turismo.json
+│       │   ├── etapa-02-memoria.json
+│       │   └── etapa-03-tool-supabase.json
+│       ├── README.md
+│       └── GUIA_INSTALACAO.md
 └── README.md                      # Este arquivo
 ```
 
 ---
 
-## ⚙️ Configurações do Gerador
-
-Você pode ajustar as constantes no início do arquivo `generate_datasets.py`:
-
-```python
-N_PRODUCTS = 200          # Quantidade de produtos
-N_CUSTOMERS = 50         # Quantidade de clientes
-DAYS = 30                # Dias de vendas
-SALES_PER_DAY = 100      # Vendas por dia
-TOP_PRODUCTS = 30        # Produtos "top sellers"
-```
-
-**Nota:** A segmentação de clientes (VIP, TOP_TIER, REGULAR) não é gerada automaticamente. Ela deve ser criada usando CASE WHEN baseado no comportamento de compra (receita total). Isso faz parte do aprendizado do Dia 1!
-
----
-
-## 🎲 Características dos Dados
-
-### Distribuições Realistas (Não-Normais)
-
-- **Produtos:** 30 produtos "top sellers" vendem muito mais
-- **Clientes:** Todos os clientes têm peso igual na geração (segmentação será criada depois com CASE WHEN)
-- **Preços:** Distribuídos em buckets (R$ 29,90 a R$ 1.499,90)
-- **Quantidades:** Maioria compra 1 unidade (72%), poucos compram mais
-- **Horários:** Picos em manhã (8-12h) e tarde (15-19h)
-- **Canais:** 72% ecommerce, 28% loja física
-- **Promoções:** 55% sem desconto, 45% com desconto (5% a 15%)
-- **Concorrentes:** Nem todos têm preço para todos os produtos (85% de cobertura)
-- **Tênis:** Produtos de tênis são os menos vendidos e têm preço o dobro dos concorrentes
-
----
-
-## 🔧 Seed e Reproducibilidade
-
-O script usa `SEED = 42` para garantir que os dados gerados sejam sempre os mesmos (reproducibilidade).
-
-Para gerar dados diferentes, altere o `SEED` ou remova a linha `random.seed(SEED)`.
-
----
-
-## 📝 Notas Técnicas
-
-- **Encoding:** UTF-8
-- **Separador:** Vírgula (CSV padrão)
-- **Datas:** Formato ISO (YYYY-MM-DD HH:MM:SS)
-- **Preços:** 2 casas decimais (R$)
-- **IDs:** UUIDs curtos (prefixo + 12 caracteres hex)
-- **Nomes de produtos:** Produtos brasileiros reais (ex: "Smartphone Galaxy A54", "Panela de Pressão")
-
----
-
-## ✅ Validação
-
-Após gerar, o script imprime um resumo:
-
-```
-✅ CSVs gerados com sucesso:
-- data/produtos.csv           (products=200 | top_sellers=30)
-- data/clientes.csv            (customers=50)
-- data/vendas.csv              (sales=3000 | ~100/dia por 30 dias)
-- data/preco_competidores.csv  (rows=680 | competitors=4)
-```
-
-**Nota:** A segmentação de clientes deve ser criada usando CASE WHEN baseado no comportamento de compra.
-
----
-
-## 🐛 Troubleshooting
-
-**Erro: "ModuleNotFoundError: No module named 'faker'"**
-```bash
-pip install faker
-```
-
-**Erro: "Permission denied" ao criar pasta data/**
-```bash
-mkdir -p data
-chmod 755 data
-```
-
----
-
-## 🚀 Próximos Passos
-
-### Para Começar a Imersão:
-
-1. **Gere os datasets:** Execute `python generate_datasets.py`
-2. **Comece o Dia 1:** Siga as instruções em [Aula 1 - SQL & Analytics](./aulas/aula-01-sql/README.md)
-3. **Execute os exemplos:** 21 exemplos SQL em ordem progressiva
-4. **Pratique:** Faça os exercícios práticos
-5. **Avance para Dia 2:** Python & Ingestão de Dados
-
----
-
 ## 🎯 Resultado Final da Imersão
 
-Ao final dos 4 dias, você terá:
+Ao final dos 4 dias, você terá construído:
 
-✅ **Projeto real no GitHub**  
-✅ **SQL aplicado a negócio**  
-✅ **Pipeline de dados funcionando**  
-✅ **IA interpretando dados e gerando insights**  
+### ✅ Sistema Completo de Dados
+
+1. **Data Warehouse** com dados estruturados
+2. **Camada Analítica** profissional (Bronze → Silver → Gold)
+3. **KPIs de Negócio** organizados em Data Marts
+4. **Interface Conversacional** para consultar dados
+
+### ✅ Habilidades Desenvolvidas
+
+- ✅ **SQL avançado** - Consultas complexas e análises de negócio
+- ✅ **Python para dados** - Ingestão, processamento e integração
+- ✅ **dbt** - Engenharia de dados moderna e profissional
+- ✅ **Agentes de IA** - Democratização de acesso a dados
+
+### ✅ Projeto Real no GitHub
+
+- ✅ Código versionado e documentado
+- ✅ Arquitetura escalável e profissional
+- ✅ Práticas de mercado aplicadas
+- ✅ Portfolio pronto para apresentar
 
 **Isso é o que o mercado procura.**
 
@@ -485,11 +612,92 @@ Cada query, cada script, cada pipeline que você construir deve responder uma pe
 
 ## 📚 Material de Apoio
 
+### 📊 Dia 1: SQL & Analytics
 - **[Aula 1 - SQL & Analytics](./aulas/aula-01-sql/README.md)** - Guia completo do primeiro dia
 - **[KPIs da Aula 1](./aulas/aula-01-sql/KPIS.md)** - Lista completa de KPIs e perguntas
-- **[Estrutura dos Dados](./aulas/aula-01-sql/ESTRUTURA_DADOS.md)** - Documentação detalhada
-- **[Queries de Exemplo](./aulas/aula-01-sql/queries/README.md)** - 21 exemplos SQL com explicações
+
+### 🐍 Dia 2: Python & Ingestão
+- **[Aula 2 - Python & Ingestão](./aulas/aula-02-python/README.md)** - Guia completo do segundo dia
+
+### 🏗️ Dia 3: dbt & Camada Analítica
+- **[Aula 3 - dbt & Camada Analítica](./aulas/aula-03-dbt/README.md)** - Guia completo do terceiro dia
+
+### 🤖 Dia 4: n8n & Agentes de IA
+- **[Aula 4 - n8n & Agentes de IA](./aulas/aula-04-n8n/README.md)** - Guia completo do quarto dia
+- **[Guia de Instalação](./aulas/aula-04-n8n/GUIA_INSTALACAO.md)** - Setup completo do n8n
+
+---
+
+## 🎓 Para Quem é Este Projeto?
+
+### ✅ Perfeito Para
+
+- **Iniciantes em dados** que querem aprender do zero
+- **Analistas de dados** que querem evoluir para engenharia
+- **Desenvolvedores** que querem entrar na área de dados
+- **Profissionais** que querem atualizar suas habilidades
+- **Estudantes** que querem um projeto real para portfolio
+
+### 🎯 Pré-requisitos
+
+- **Nenhum conhecimento prévio necessário!**
+- Apenas vontade de aprender e praticar
+- Acesso a internet para usar Supabase e n8n Cloud
+
+---
+
+## 🚀 Próximos Passos
+
+### Para Começar a Imersão:
+
+1. **Gere os datasets:** Execute `python generate_datasets.py`
+2. **Configure Supabase:** Crie conta e projeto
+3. **Comece o Dia 1:** Siga as instruções em [Aula 1 - SQL & Analytics](./aulas/aula-01-sql/README.md)
+4. **Execute os exemplos:** 21 exemplos SQL em ordem progressiva
+5. **Avance para Dia 2:** Python & Ingestão de Dados
+6. **Continue até Dia 4:** Construa o sistema completo
+
+---
+
+## 📊 Métricas do Projeto
+
+```mermaid
+graph TB
+    subgraph Metricas["📊 Métricas do Projeto"]
+        D1["📅 4 dias<br/>Aprendizado Intensivo"]
+        D2["📝 21 exemplos SQL<br/>Básico ao Avançado"]
+        D3["🐍 5 exemplos Python<br/>Ingestão de Dados"]
+        D4["🏗️ 19 modelos dbt<br/>4 Bronze, 5 Silver, 10 Gold"]
+        D5["🤖 4 workflows n8n<br/>Agentes de IA"]
+        D6["📈 10 KPIs de Negócio<br/>3 Data Marts"]
+        D7["📦 200 produtos<br/>50 clientes<br/>~3.000 vendas"]
+    end
+    
+    style Metricas fill:#4A90E2,color:#fff
+    style D1 fill:#FF6B6B,color:#fff
+    style D2 fill:#50C878,color:#fff
+    style D3 fill:#3776AB,color:#fff
+    style D4 fill:#9B59B6,color:#fff
+    style D5 fill:#E67E22,color:#fff
+    style D6 fill:#F39C12,color:#fff
+    style D7 fill:#2ECC71,color:#fff
+```
+
+---
+
+## 🎯 Objetivos de Aprendizado
+
+Ao final da imersão, você será capaz de:
+
+- ✅ **Analisar dados** com SQL avançado
+- ✅ **Coletar dados** de múltiplas fontes (APIs, Data Lakes)
+- ✅ **Transformar dados** em camadas analíticas profissionais
+- ✅ **Criar KPIs** de negócio organizados
+- ✅ **Democratizar dados** com Agentes de IA
+- ✅ **Construir sistemas** de dados end-to-end
 
 ---
 
 **Boa jornada! 🚀**
+
+*Este projeto foi criado para ser prático, real e aplicável. Cada linha de código, cada query, cada modelo foi pensado para resolver um problema real de negócio.*

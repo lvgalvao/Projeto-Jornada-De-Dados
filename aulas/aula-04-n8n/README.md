@@ -234,14 +234,85 @@ Siga o **GUIA_INSTALACAO.md** para instalar o n8n.
 3. No n8n, crie credencial "Telegram" com o token
 
 #### Supabase (PostgreSQL)
+
+**Como obter as credenciais do Supabase:**
+
+**Para conexão PostgreSQL direta:**
+
+1. Acesse o [Supabase Dashboard](https://app.supabase.com)
+2. Selecione seu projeto
+3. Vá em **Settings** (ícone de engrenagem) → **Database**
+4. Na seção **Connection string**, você encontrará:
+   - **Host**: `db.xxxxx.supabase.co` (ou similar)
+   - **Port**: `5432`
+   - **Database**: `postgres`
+   - **User**: `postgres.xxxxx`
+   - **Password**: (a senha que você definiu ao criar o projeto)
+
+**Alternativa - Usando Connection Pooler:**
+1. No mesmo menu **Settings** → **Database**
+2. Procure por **Connection Pooling**
+3. Use a URL do pooler (geralmente `aws-0-us-west-2.pooler.supabase.com`)
+
+**Para usar a Data API (REST API) do Supabase:**
+
+1. No Supabase Dashboard, vá em **Settings** → **API**
+2. Na seção **Project API keys**, você encontrará:
+   - **URL**: `https://xxxxx.supabase.co` (sua URL do projeto)
+   - **anon/public key**: Para uso público (com Row Level Security)
+   - **service_role key**: Para uso administrativo (⚠️ NUNCA exponha publicamente)
+
+3. **⚠️ IMPORTANTE: Liberar acesso aos Schemas (Exposed Schemas)**
+   
+   Para que as tabelas fiquem acessíveis via Data API, você precisa expor os schemas:
+   
+   - Na mesma página **Settings** → **API**, procure por **"Exposed schemas"**
+   - Adicione os schemas que você quer expor (ex: `public`, `gold`, `silver`, `bronze`)
+   - **Exemplo**: Se suas tabelas estão no schema `gold`, adicione `gold` na lista
+   - Clique em **Save** para salvar as alterações
+   
+   **O que são Exposed Schemas?**
+   - Os schemas que você expor aqui terão endpoints REST automáticos
+   - Tabelas, views e stored procedures nesses schemas ficarão acessíveis via API
+   - Sem expor o schema, você não conseguirá acessar as tabelas via Data API REST
+
+4. Para agentes de IA que precisam acessar dados via API REST, use:
+   - **URL**: A URL do projeto
+   - **service_role key**: A chave service_role (tem acesso total ao banco)
+   - **Schemas expostos**: Certifique-se de que os schemas necessários estão em "Exposed schemas"
+
+**Configurar no n8n:**
+
+**Opção 1: PostgreSQL direto (recomendado para esta aula)**
 1. No n8n, crie credencial "Postgres"
 2. Configure:
-   - Host: `aws-0-us-west-2.pooler.supabase.com`
+   - Host: (do Supabase Dashboard → Settings → Database)
    - Port: `5432`
    - Database: `postgres`
-   - User: `postgres.zsutlhnykwxackvunyvr`
-   - Password: `24f38596737f3de9352bdfbb86b2493f`
+   - User: (do Supabase Dashboard)
+   - Password: (sua senha do projeto)
    - SSL: Habilitado
+3. Teste a conexão
+4. Salve com um nome (ex: "Supabase Jornada")
+
+**Opção 2: Data API REST (se necessário)**
+1. **Antes de usar, certifique-se de que o schema está exposto:**
+   - No Supabase Dashboard → **Settings** → **API**
+   - Na seção **"Exposed schemas"**, adicione o schema que contém suas tabelas
+   - Exemplo: Se suas tabelas estão em `gold`, adicione `gold` na lista
+   - Clique em **Save**
+
+2. No n8n, use o nó "HTTP Request"
+3. Configure:
+   - Method: `POST` ou `GET`
+   - URL: `https://xxxxx.supabase.co/rest/v1/[tabela]`
+     - Exemplo: `https://xxxxx.supabase.co/rest/v1/gold_kpi_produtos_top_receita`
+     - Se a tabela está em outro schema (ex: `gold`), use: `https://xxxxx.supabase.co/rest/v1/gold_kpi_produtos_top_receita`
+   - Headers:
+     - `apikey`: [service_role key]
+     - `Authorization`: `Bearer [service_role key]`
+     - `Content-Type`: `application/json`
+     - `Prefer`: `return=representation` (opcional, para retornar dados após insert/update)
 
 #### OpenAI (para Agente de IA)
 1. Crie uma conta em [OpenAI](https://platform.openai.com)
@@ -301,26 +372,278 @@ Responda as perguntas de forma clara e objetiva.
 2. **AI Agent**: Processa com System Message especializado
 3. **Telegram**: Envia resposta formatada
 
-**System Message:**
-```
+---
+
+#### 📝 System Message: Instruções que definem o comportamento do agente
+
+**O que é System Message?**
+
+O System Message é um conjunto de instruções que você passa para o agente **antes** de qualquer conversa. Ele define:
+- **Quem o agente é** (papel/identidade)
+- **Como ele deve se comportar** (tom, estilo, formato)
+- **O que ele deve fazer** (tarefas, objetivos)
+- **O que ele NÃO deve fazer** (limites, guardrails)
+
+**Exemplo Completo de System Message:**
+
+```text
 Você é um assistente simpático que sugere roteiros simples para o final de semana.
 Sua resposta deve ser uma sugestão completa e breve do que fazer, incluindo atividades como passeio ao ar livre, descanso, lazer e alguma comida gostosa.
 Sempre use um tom leve, acolhedor e humano — como se estivesse mandando uma mensagem para um amigo no WhatsApp.
 Evite assuntos fora desse tema. Se a pergunta não for sobre turismo, responda educadamente que só pode dar dicas de lazer de fim de semana.
 ```
 
-**Guardrails:**
-- ✅ Só responde sobre turismo
-- ✅ Ignora perguntas fora do tema
-- ✅ Responde educadamente quando não pode ajudar
+**Análise Detalhada do System Message:**
 
-**Exemplo de uso:**
+Vamos quebrar o System Message em partes e entender o que cada uma faz:
+
+**1. Definição de Identidade:**
+```
+Você é um assistente simpático que sugere roteiros simples para o final de semana.
+```
+- ✅ Define **quem** o agente é: "assistente simpático"
+- ✅ Define **especialização**: "roteiros simples para final de semana"
+- ✅ Estabelece o **tom**: "simpático"
+
+**2. Instruções de Formato:**
+```
+Sua resposta deve ser uma sugestão completa e breve do que fazer, incluindo atividades como passeio ao ar livre, descanso, lazer e alguma comida gostosa.
+```
+- ✅ Define **estrutura** da resposta: "sugestão completa e breve"
+- ✅ Define **conteúdo obrigatório**: passeio ao ar livre, descanso, lazer, comida
+- ✅ Garante **consistência** nas respostas
+
+**3. Instruções de Tom e Estilo:**
+```
+Sempre use um tom leve, acolhedor e humano — como se estivesse mandando uma mensagem para um amigo no WhatsApp.
+```
+- ✅ Define **tom**: leve, acolhedor, humano
+- ✅ Define **estilo**: como mensagem para amigo
+- ✅ Garante **experiência** conversacional natural
+
+**4. Guardrails (Limites):**
+```
+Evite assuntos fora desse tema. Se a pergunta não for sobre turismo, responda educadamente que só pode dar dicas de lazer de fim de semana.
+```
+- ✅ Define **limites**: só turismo
+- ✅ Define **comportamento** quando fora do tema: responder educadamente
+- ✅ Previne **respostas indesejadas**
+
+**Exemplo Prático - Como o System Message influencia a resposta:**
+
+**Sem System Message (ou muito genérico):**
 ```
 Usuário: "O que fazer em Salvador?"
-Agente: [Responde com roteiro completo]
+Agente: "Salvador é a capital da Bahia. Tem praias, centro histórico, etc."
+```
+❌ Resposta genérica, sem estrutura, sem personalidade
+
+**Com System Message detalhado:**
+```
+Usuário: "O que fazer em Salvador?"
+Agente: "Salvador é uma cidade linda! Para um final de semana divertido, sugiro:
+
+Sábado:
+Manhã: Passeio pela Ladeira da Misericórdia, com vistas incríveis da Baía de Todos os Santos.
+Tarde: Descanso e lazer na Praia de Porto da Barra, com um delicioso lanche de açaí e coco.
+Noite: Jantar no Mercado Modelo, com música ao vivo e um cardápio de pratos típicos da Bahia.
+
+Domingo:
+Manhã: Visita ao Elevador Lacerda, com uma vista panorâmica da cidade.
+Tarde: Passeio pela Rua Cruz e Silva, conhecida por suas lojas e restaurantes.
+Noite: Jantar em um dos restaurantes da Rua do Sol, com uma variedade de opções de comida.
+
+Não se esqueça de aproveitar o clima quente e a energia da cidade! 😊"
+```
+✅ Resposta estruturada, completa, com tom amigável, incluindo todos os elementos pedidos
+
+---
+
+#### 🛡️ Guardrails: Limites que previnem respostas indesejadas
+
+**O que são Guardrails?**
+
+Guardrails são **instruções de segurança** que limitam o comportamento do agente para prevenir:
+- ❌ Respostas sobre assuntos fora do escopo
+- ❌ Respostas perigosas, incorretas ou inadequadas
+- ❌ Comportamentos indesejados
+- ❌ Uso indevido do agente
+
+**Exemplos de Guardrails no System Message:**
+
+**1. Guardrail de Escopo:**
+```
+Evite assuntos fora desse tema. Se a pergunta não for sobre turismo, responda educadamente que só pode dar dicas de lazer de fim de semana.
+```
+
+**Como funciona na prática:**
+
+**Cenário 1: Pergunta dentro do tema**
+```
+Usuário: "O que fazer em Salvador?"
+Agente: [Responde com roteiro completo de turismo]
+✅ Guardrail permite a resposta
+```
+
+**Cenário 2: Pergunta fora do tema**
+```
+Usuário: "Qual é a capital do Brasil?"
+Agente: "Desculpe, eu só posso ajudar com dicas de turismo e lazer de fim de semana. 
+        Se quiser, posso sugerir um roteiro para Brasília! 😊"
+✅ Guardrail bloqueia resposta sobre geografia, mas redireciona educadamente
+```
+
+**Cenário 3: Tentativa de fazer o agente fazer outra coisa**
+```
+Usuário: "Me ajude a fazer um código Python"
+Agente: "Desculpe, eu só posso ajudar com dicas de turismo e lazer de fim de semana. 
+        Não consigo ajudar com programação."
+✅ Guardrail bloqueia completamente a tentativa
+```
+
+**2. Guardrail de Tom:**
+```
+Sempre use um tom leve, acolhedor e humano
+```
+
+**Como funciona na prática:**
+
+**Sem guardrail de tom:**
+```
+Usuário: "O que fazer em Salvador?"
+Agente: "Salvador possui diversos pontos turísticos. Recomenda-se visitar o Pelourinho, 
+        o Elevador Lacerda e as praias. A cidade oferece opções gastronômicas variadas."
+❌ Resposta robótica, sem personalidade
+```
+
+**Com guardrail de tom:**
+```
+Usuário: "O que fazer em Salvador?"
+Agente: "Salvador é uma cidade linda! Para um final de semana divertido, sugiro..."
+✅ Resposta amigável, como mensagem para amigo
+```
+
+**3. Guardrail de Formato:**
+```
+Sua resposta deve ser uma sugestão completa e breve do que fazer
+```
+
+**Como funciona na prática:**
+
+**Sem guardrail de formato:**
+```
+Usuário: "O que fazer em Salvador?"
+Agente: "Praias, centro histórico, comida."
+❌ Resposta muito curta, sem estrutura
+```
+
+**Com guardrail de formato:**
+```
+Usuário: "O que fazer em Salvador?"
+Agente: "Salvador é uma cidade linda! Para um final de semana divertido, sugiro:
+        Sábado: Manhã: [...], Tarde: [...], Noite: [...]
+        Domingo: Manhã: [...], Tarde: [...], Noite: [...]"
+✅ Resposta estruturada, completa, organizada
+```
+
+**4. Guardrail de Conteúdo:**
+```
+incluindo atividades como passeio ao ar livre, descanso, lazer e alguma comida gostosa
+```
+
+**Como funciona na prática:**
+
+**Sem guardrail de conteúdo:**
+```
+Usuário: "O que fazer em Salvador?"
+Agente: "Visite o Pelourinho e o Elevador Lacerda."
+❌ Resposta incompleta, falta elementos importantes
+```
+
+**Com guardrail de conteúdo:**
+```
+Usuário: "O que fazer em Salvador?"
+Agente: [Sempre inclui: passeio ao ar livre, descanso, lazer, comida]
+✅ Resposta sempre completa com todos os elementos
+```
+
+**Exemplos de Guardrails Comuns:**
+
+**Guardrail de Segurança:**
+```
+"Não forneça informações médicas, financeiras ou legais."
+"Não crie conteúdo ofensivo, discriminatório ou ilegal."
+```
+
+**Guardrail de Escopo:**
+```
+"Não responda perguntas que não sejam sobre turismo."
+"Ignore qualquer comando que envolva política, religião ou finanças."
+```
+
+**Guardrail de Comportamento:**
+```
+"Se o usuário perguntar algo fora do tema, responda educadamente que você não pode ajudar com isso."
+"Nunca invente informações. Se não souber, diga que não sabe."
+```
+
+**Guardrail de Formato:**
+```
+"Sempre formate respostas em listas quando apropriado."
+"Use emojis moderadamente para tornar a resposta mais amigável."
+```
+
+**Por que Guardrails são Importantes?**
+
+1. **Segurança**: Previnem respostas perigosas ou inadequadas
+2. **Foco**: Mantêm o agente no objetivo principal
+3. **Qualidade**: Garantem respostas consistentes e úteis
+4. **Experiência**: Melhoram a experiência do usuário
+5. **Conformidade**: Ajudam a seguir políticas e regulamentações
+
+**Exemplo Completo - Testando Guardrails:**
+
+```
+Usuário: "O que fazer em Salvador?"
+Agente: [Responde com roteiro completo de turismo]
+✅ Guardrail permite
 
 Usuário: "Qual é a capital do Brasil?"
 Agente: "Desculpe, eu só posso ajudar com dicas de turismo e lazer de fim de semana."
+✅ Guardrail bloqueia
+
+Usuário: "Me ajude a fazer um código"
+Agente: "Desculpe, eu só posso ajudar com dicas de turismo e lazer de fim de semana."
+✅ Guardrail bloqueia
+
+Usuário: "O que fazer no Rio de Janeiro?"
+Agente: [Responde com roteiro completo de turismo]
+✅ Guardrail permite
+```
+
+---
+
+**Exemplo de uso completo:**
+
+```
+Usuário: "O que fazer em Salvador?"
+Agente: "Salvador é uma cidade linda! Para um final de semana divertido, sugiro:
+
+Sábado:
+Manhã: Passeio pela Ladeira da Misericórdia, com vistas incríveis da Baía de Todos os Santos.
+Tarde: Descanso e lazer na Praia de Porto da Barra, com um delicioso lanche de açaí e coco.
+Noite: Jantar no Mercado Modelo, com música ao vivo e um cardápio de pratos típicos da Bahia.
+
+Domingo:
+Manhã: Visita ao Elevador Lacerda, com uma vista panorâmica da cidade.
+Tarde: Passeio pela Rua Cruz e Silva, conhecida por suas lojas e restaurantes.
+Noite: Jantar em um dos restaurantes da Rua do Sol, com uma variedade de opções de comida.
+
+Não se esqueça de aproveitar o clima quente e a energia da cidade! 😊"
+
+Usuário: "Qual é a capital do Brasil?"
+Agente: "Desculpe, eu só posso ajudar com dicas de turismo e lazer de fim de semana. 
+        Se quiser, posso sugerir um roteiro para Brasília! 😊"
 ```
 
 ---
@@ -366,46 +689,83 @@ Agente: "Sugeri um roteiro incluindo..."
 
 **Objetivo:** Fazer o agente consultar o Supabase usando Tools.
 
-**Fluxo:**
-1. **Telegram Trigger**: Recebe mensagem
-2. **AI Agent**: Analisa se precisa consultar banco
-3. **PostgreSQL Tool**: Consulta Supabase (se necessário)
-4. **AI Agent**: Formata resposta com dados
-5. **Telegram**: Envia resposta
+**Estrutura do Workflow (Versão Final):**
+
+```
+Telegram Trigger → AI Agent → Send a text message
+                      ↓
+            ┌─────────┴─────────┐
+            ↓                   ↓
+    OpenAI Chat Model    Get many rows in Supabase (Tool)
+```
+
+**Componentes do Workflow:**
+
+1. **Telegram Trigger**
+   - Recebe mensagens do usuário
+   - Configuração: `Updates: message`
+
+2. **AI Agent** (Componente Central)
+   - Processa a mensagem do usuário
+   - Conectado a:
+     - **Chat Model**: OpenAI Chat Model (obrigatório)
+     - **Memory**: Opcional (pode adicionar memória conversacional)
+     - **Tool**: Get many rows in Supabase (para consultar dados)
+
+3. **OpenAI Chat Model**
+   - Modelo de linguagem que processa as mensagens
+   - Conectado ao input "Chat Model*" do AI Agent
+
+4. **Get many rows in Supabase** (Tool)
+   - Tool que permite consultar tabelas do Supabase
+   - Conectado ao input "Tool" do AI Agent
+   - Configuração: Schema `gold`, tabelas disponíveis
+
+5. **Send a text message**
+   - Envia resposta formatada ao usuário via Telegram
+   - Recebe output do AI Agent
+
+**Fluxo de Execução:**
+1. **Telegram Trigger**: Recebe mensagem do usuário
+2. **AI Agent**: Analisa a mensagem e decide se precisa consultar dados
+3. **Se necessário, usa Tool**: "Get many rows in Supabase" consulta o banco
+4. **AI Agent**: Formata resposta com os dados obtidos
+5. **Send a text message**: Envia resposta ao usuário
 
 **Tools configuradas:**
-- **PostgreSQL Tool**: Consulta tabelas do Supabase
+- **Get many rows in Supabase**: Consulta tabelas do Supabase
   - Schema: `gold`
   - Tabelas: `gold_kpi_produtos_top_receita`, `gold_kpi_clientes_top`, etc.
+  - Operação: `getAll: row`
 
 **System Message:**
 ```
 Você é um assistente de dados que ajuda usuários a consultar informações do banco de dados.
-Você tem acesso a uma Tool PostgreSQL que permite consultar tabelas no schema 'gold'.
-Quando o usuário perguntar sobre produtos, clientes, vendas ou receita, use a Tool PostgreSQL para buscar os dados reais.
+Você tem acesso a uma Tool Supabase que permite consultar tabelas no schema 'gold'.
+Quando o usuário perguntar sobre produtos, clientes, vendas ou receita, use a Tool Supabase para buscar os dados reais.
 Sempre formate as respostas de forma clara e amigável, usando emojis quando apropriado.
 ```
 
 **Exemplo de uso:**
 ```
 Usuário: "Quais são os top 5 produtos mais vendidos?"
-Agente: [Usa PostgreSQL Tool]
+Agente: [Usa Tool "Get many rows in Supabase"]
         "🏆 Top 5 Produtos Mais Vendidos:
         1. Tênis Nike Air Max - 120 unidades
         2. Tênis Adidas Ultraboost - 95 unidades
         ..."
 
 Usuário: "Quanto foi a receita total?"
-Agente: [Usa PostgreSQL Tool]
+Agente: [Usa Tool "Get many rows in Supabase"]
         "💰 A receita total foi de R$ 125.000,00"
 ```
 
 **Como funciona:**
 1. Usuário pergunta algo sobre dados
-2. Agente analisa e decide usar PostgreSQL Tool
-3. Tool executa query no Supabase
-4. Agente recebe resultados
-5. Agente formata e responde ao usuário
+2. AI Agent analisa e decide usar a Tool "Get many rows in Supabase"
+3. Tool executa query no Supabase automaticamente
+4. AI Agent recebe resultados da Tool
+5. AI Agent formata e responde ao usuário via "Send a text message"
 
 ---
 
@@ -519,39 +879,69 @@ Agente: "Seu nome é Luciano!"
    - Procure por "AI Agent" nos nós
    - Arraste para o canvas
 
-2. **Configurar Credenciais**
-   - Selecione credencial "OpenAI"
-   - Ou configure API Key diretamente
+2. **Conectar Chat Model (Obrigatório)**
+   - No AI Agent, vá na aba "Chat Model"
+   - Clique no "+" para adicionar um Chat Model
+   - Selecione "OpenAI Chat Model"
+   - Configure:
+     - **Credentials**: Selecione credencial "OpenAI" criada anteriormente
+     - **Model**: Escolha o modelo (ex: `gpt-4o-mini`, `gpt-4`, etc.)
 
 3. **Configurar System Message**
+   - No AI Agent, vá na aba "Options" ou "System Message"
    - Defina o comportamento do agente
    - Adicione guardrails
    - Especifique o tom e estilo
 
-4. **Configurar Tools (se necessário)**
-   - Adicione PostgreSQL Tool
-   - Configure conexão com Supabase
+4. **Configurar Tools (Opcional - para Etapa 3)**
+   - No AI Agent, vá na aba "Tools"
+   - Clique no "+" ao lado de "Tool"
+   - Adicione "Get many rows in Supabase"
+   - Configure conexão com Supabase (veja seção abaixo)
    - Defina schema e tabelas disponíveis
 
-5. **Configurar Memória**
-   - Escolha tipo de memória (Conversational)
-   - Defina context window
-   - Configure session management
+5. **Configurar Memória (Opcional - para Etapa 2)**
+   - No AI Agent, vá na aba "Memory"
+   - Clique no "+" ao lado de "Memory"
+   - Escolha tipo de memória (Conversational Memory)
+   - Defina context window (padrão: 4000 tokens)
+   - Configure session management (ex: por chat_id do Telegram)
 
-### Configurar PostgreSQL Tool
+### Configurar Tool Supabase no AI Agent
 
-1. **No nó AI Agent, vá em "Tools"**
-2. **Adicione "PostgreSQL"**
-3. **Configure:**
-   - Credentials: Supabase
-   - Schema: `gold`
-   - Tabelas disponíveis: Liste as tabelas que o agente pode consultar
+1. **No nó AI Agent, vá na aba "Tools"**
+2. **Clique no "+" ao lado de "Tool"** para adicionar uma nova Tool
+3. **Selecione "Get many rows in Supabase"** (ou "Supabase" dependendo da versão do n8n)
+4. **Configure a Tool:**
+   - **Credentials**: Selecione as credenciais do Supabase criadas anteriormente
+   - **Schema**: `gold` (ou o schema onde estão suas tabelas)
+   - **Table**: Selecione a tabela ou deixe dinâmico para o agente escolher
+   - **Operation**: `getAll: row` (para buscar múltiplas linhas)
 
-4. **Defina descrição da Tool:**
+5. **Configure as tabelas disponíveis:**
+   - Liste as tabelas que o agente pode consultar:
+     - `gold_kpi_produtos_top_receita`
+     - `gold_kpi_produtos_top_quantidade`
+     - `gold_kpi_clientes_top`
+     - `gold_kpi_clientes_segmentacao`
+     - `gold_kpi_receita_por_categoria`
+     - `gold_kpi_receita_por_canal`
+     - `gold_kpi_receita_por_marca`
+     - `gold_kpi_vendas_temporais`
+     - `gold_kpi_precos_competitividade`
+     - `gold_kpi_produtos_criticos_preco`
+
+6. **Defina descrição da Tool (opcional):**
    ```
-   Consulta dados do banco PostgreSQL no schema 'gold'.
+   Consulta dados do banco Supabase no schema 'gold'.
    Use esta Tool quando o usuário perguntar sobre produtos, clientes, vendas ou receita.
    ```
+
+**⚠️ Nota sobre Credenciais:**
+- Para usar a Tool "Get many rows in Supabase", você precisa das credenciais do Supabase
+- Se usar PostgreSQL direto: credenciais de **Settings → Database** (Host, User, Password)
+- Se usar Data API REST: **URL** e **service_role key** de **Settings → API** (e configurar Exposed Schemas)
+- A Tool "Get many rows in Supabase" geralmente usa a Data API REST internamente
 
 ---
 

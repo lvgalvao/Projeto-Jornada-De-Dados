@@ -88,22 +88,96 @@ n8n start
 
 ### 1. Criar Credenciais do Supabase
 
+#### Passo 1: Obter Credenciais do Supabase Dashboard
+
+**Para conexão PostgreSQL (usado nesta aula):**
+
+1. Acesse o [Supabase Dashboard](https://app.supabase.com)
+2. Faça login e selecione seu projeto
+3. Vá em **Settings** (ícone de engrenagem no menu lateral)
+4. Clique em **Database**
+
+**Opção A: Connection String Direta**
+- Na seção **Connection string**, você verá:
+  - **Host**: `db.xxxxx.supabase.co` (exemplo: `db.zsutlhnykwxackvunyvr.supabase.co`)
+  - **Port**: `5432`
+  - **Database**: `postgres`
+  - **User**: `postgres.xxxxx` (exemplo: `postgres.zsutlhnykwxackvunyvr`)
+  - **Password**: A senha que você definiu ao criar o projeto
+
+**Opção B: Connection Pooler (Recomendado para produção)**
+- Na mesma página, procure por **Connection Pooling**
+- Use a URL do pooler (exemplo: `aws-0-us-west-2.pooler.supabase.com`)
+- A porta geralmente é `5432`
+- User e Password são os mesmos da Connection String
+
+**Para usar a Data API (REST API) do Supabase:**
+
+1. No Supabase Dashboard, vá em **Settings** → **API**
+2. Na seção **Project API keys**, você encontrará:
+   - **URL**: `https://xxxxx.supabase.co` (sua URL do projeto - ex: `https://zsutlhnykwxackvunyvr.supabase.co`)
+   - **anon/public key**: Para uso público (com Row Level Security)
+   - **service_role key**: Para uso administrativo (⚠️ NUNCA exponha publicamente)
+
+3. **⚠️ IMPORTANTE: Configurar Exposed Schemas**
+   
+   Para fazer queries nas tabelas via Data API, você precisa expor os schemas:
+   
+   - Na mesma página **Settings** → **API**, procure pela seção **"Exposed schemas"**
+   - Esta seção mostra quais schemas estão expostos na API
+   - **Adicione os schemas que você quer acessar**:
+     - Se suas tabelas estão em `public`, adicione `public`
+     - Se suas tabelas estão em `gold` (como na Aula 3), adicione `gold`
+     - Se suas tabelas estão em `silver`, adicione `silver`
+     - Se suas tabelas estão em `bronze`, adicione `bronze`
+   - Você pode adicionar múltiplos schemas separados por vírgula
+   - Clique em **Save** para salvar as alterações
+   
+   **O que são Exposed Schemas?**
+   > "The schemas to expose in your API. Tables, views and stored procedures in these schemas will get API endpoints."
+   
+   - Tabelas, views e stored procedures nos schemas expostos terão endpoints REST automáticos
+   - Sem expor o schema, você **não conseguirá** acessar as tabelas via Data API REST
+   - Exemplo: Se você quer acessar `gold.gold_kpi_produtos_top_receita`, precisa expor o schema `gold`
+
+4. Para agentes de IA que precisam acessar dados via API REST, use:
+   - **URL**: A URL do projeto (ex: `https://xxxxx.supabase.co`)
+   - **service_role key**: A chave service_role (tem acesso total ao banco)
+   - **Schemas expostos**: Certifique-se de que os schemas necessários estão configurados em "Exposed schemas"
+
+**📝 Resumo:**
+- **PostgreSQL direto**: Use credenciais de **Settings → Database** (Host, User, Password)
+- **Data API REST**: Use **URL** e **service_role key** de **Settings → API**
+- **⚠️ IMPORTANTE para Data API**: Configure **Exposed schemas** em **Settings → API** para liberar acesso às tabelas
+
+#### Passo 2: Configurar no n8n
+
 1. No n8n, clique no ícone de **chave** (Credentials) no menu lateral
 2. Clique em **"Add Credential"**
 3. Procure por **"Postgres"** e selecione
-4. Preencha os dados:
+4. Preencha os dados obtidos do Supabase:
 
 ```
-Host: aws-0-us-west-2.pooler.supabase.com
+Host: [do Supabase Dashboard - ex: aws-0-us-west-2.pooler.supabase.com]
 Port: 5432
 Database: postgres
-User: postgres.zsutlhnykwxackvunyvr
-Password: 24f38596737f3de9352bdfbb86b2493f
+User: [do Supabase Dashboard - ex: postgres.zsutlhnykwxackvunyvr]
+Password: [sua senha do projeto Supabase]
 SSL: Enable SSL
 ```
 
 5. Clique em **"Test"** para verificar conexão
 6. Clique em **"Save"** e dê um nome: **"Supabase Jornada"**
+
+**⚠️ Importante:**
+- Mantenha suas credenciais seguras
+- Nunca compartilhe a **service_role key** publicamente
+- Use **Connection Pooler** em produção para melhor performance
+- Para esta aula, usamos **PostgreSQL direto** (não a Data API)
+- Se precisar usar a Data API REST:
+  - Você precisará da **URL** e **service_role key** de **Settings → API**
+  - **OBRIGATÓRIO**: Configure os **Exposed schemas** em **Settings → API** para liberar acesso às tabelas
+  - Sem expor o schema, as tabelas não estarão acessíveis via Data API REST
 
 ---
 
